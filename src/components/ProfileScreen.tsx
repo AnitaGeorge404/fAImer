@@ -276,7 +276,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack }) => {
         {/* App Version */}
         <div className="text-center py-4">
           <p className="text-xs text-gray-500 dark:text-muted-foreground">
-            VayalCare v1.0.0
+            fAImer v1.0.0
           </p>
         </div>
       </div>

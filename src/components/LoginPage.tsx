@@ -225,12 +225,12 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onLanguageChange }) => {
             <div className="w-32 h-32 mx-auto mb-4 flex items-center justify-center">
               <img
                 src="/lovable-uploads/b68830df-4731-4efe-b233-08588e1334b3.png"
-                alt="VayalCare Logo"
+                alt="fAImer Logo"
                 className="w-full h-full object-contain"
               />
             </div>
             <h1 className="text-2xl font-bold text-green-800 dark:text-green-400 mb-2 transition-colors duration-300">
-              VayalCare
+              fAImer
             </h1>
             <p className="text-green-600 dark:text-green-300 text-sm transition-colors duration-300">
               Your Personal Farming Assistant
