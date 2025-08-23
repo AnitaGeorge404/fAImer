@@ -1,10 +1,11 @@
 .plant-interface {
   min-height: 100vh;
   /* Updated background to match the app's clean feel */
-  background: #f8f9fa; 
+  background: #f8f9fa;
   display: flex;
   flex-direction: column;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
   color: #333;
 }
 
@@ -14,7 +15,7 @@
   align-items: center;
   padding: 1rem 1.5rem;
   background-color: #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .back-button {
@@ -22,7 +23,7 @@
   border: none;
   cursor: pointer;
   margin-right: 1rem;
-  color: #4CAF50; /* App's primary green */
+  color: #4caf50; /* App's primary green */
 }
 
 .header-title {
@@ -30,7 +31,6 @@
   font-weight: 600;
   margin: 0;
 }
-
 
 /* Carousel Selector Styles */
 .carousel-container {
@@ -57,7 +57,7 @@
 }
 
 .carousel-item.active {
-  border-color: #4CAF50; /* Green accent */
+  border-color: #4caf50; /* Green accent */
   transform: scale(1.1);
   box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
 }
@@ -71,7 +71,7 @@
   bottom: -0.75rem;
   width: 0.5rem;
   height: 0.5rem;
-  background: #4CAF50; /* Green accent */
+  background: #4caf50; /* Green accent */
   border-radius: 50%;
 }
 
@@ -133,13 +133,14 @@
 
 .waveform-bar {
   width: 0.25rem;
-  background: #4CAF50; /* Green accent */
+  background: #4caf50; /* Green accent */
   border-radius: 0.125rem;
 }
 
 /* Audio Section */
 .audio-section {
   padding: 1.5rem;
+  padding-bottom: 7rem;
 }
 
 /* Microphone Button */
@@ -163,13 +164,13 @@
 }
 
 .mic-button.listening {
-  background: linear-gradient(135deg, #4CAF50, #81C784);
+  background: linear-gradient(135deg, #4caf50, #81c784);
 }
 
 .mic-icon {
   width: 2rem;
   height: 2rem;
-  color: #4CAF50; /* Green accent */
+  color: #4caf50; /* Green accent */
 }
 
 .mic-icon.active {

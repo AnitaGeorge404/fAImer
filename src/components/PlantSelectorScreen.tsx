@@ -1,6 +1,14 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Mic, Home, Database, FileText, Bell, User, ArrowLeft } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  Mic,
+  Home,
+  Database,
+  FileText,
+  Bell,
+  User,
+  ArrowLeft,
+} from "lucide-react";
 import "./PlantSelector.css";
 
 // Define a type for our plant objects for type safety

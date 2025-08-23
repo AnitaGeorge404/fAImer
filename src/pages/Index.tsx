@@ -20,6 +20,7 @@ import GovtSchemesScreen from "../components/GovtSchemesScreen";
 import LabourerHub from "../components/LabourerHub";
 import FairFarm from "../components/FairFarm";
 import CropWise from "../components/CropWise";
+import PlantSelectorScreen from "../components/PlantSelectorScreen";
 import BottomNavigation from "../components/BottomNavigation";
 
 const Index = () => {
@@ -112,6 +113,8 @@ const Index = () => {
         return <GovtSchemesScreen onBack={() => setActiveTab("resources")} />;
       case "labourers":
         return <LabourerHub onBack={() => setActiveTab("resources")} />;
+      case "plants":
+        return <PlantSelectorScreen />;
       case "fairfarm":
         return <FairFarm onBack={() => setActiveTab("home")} />;
       case "cropwise":

@@ -85,6 +85,13 @@ const KnowledgeCenterScreen: React.FC<KnowledgeCenterScreenProps> = ({
               image:
                 "/lovable-uploads/87bc0776-6ff4-4209-a8b5-8b0c47dc938a.png",
             },
+            {
+              id: "plants",
+              title: "Plant Care",
+              icon: FileText,
+              image:
+                "/lovable-uploads/87bc0776-6ff4-4209-a8b5-8b0c47dc938a.png",
+            },
           ].map((tool) => {
             const Icon = tool.icon;
             return (
