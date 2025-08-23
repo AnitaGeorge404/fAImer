@@ -1,0 +1,380 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* Import Inter font */
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 142 76% 36%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 142 76% 36%;
+
+    /* Farm Management cards background (mint) */
+    --farm-mgmt: 136 100% 97%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 220 13% 7%;
+    --foreground: 210 40% 98%;
+
+    --card: 220 13% 9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 220 13% 9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 142 76% 45%;
+    --primary-foreground: 210 40% 2%;
+
+    --secondary: 220 13% 12%;
+    --secondary-foreground: 210 40% 95%;
+
+    --muted: 220 13% 12%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 220 13% 15%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 220 13% 18%;
+    --input: 220 13% 15%;
+    --ring: 142 76% 45%;
+
+    --sidebar-background: 220 13% 5%;
+    --sidebar-foreground: 210 40% 95%;
+    --sidebar-primary: 142 76% 45%;
+    --sidebar-primary-foreground: 210 40% 2%;
+    --sidebar-accent: 220 13% 12%;
+    --sidebar-accent-foreground: 210 40% 95%;
+    --sidebar-border: 220 13% 15%;
+    --sidebar-ring: 142 76% 45%;
+
+    /* Farm Management cards background (dark variant) */
+    --farm-mgmt: 136 30% 12%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  /* Hide scrollbars for webkit browsers (Chrome, Safari, Edge) */
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbars for Firefox */
+  * {
+    scrollbar-width: none;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "DM Sans", sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    /* Hide scrollbar for body */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow-x: hidden;
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
+  }
+
+  body::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Smooth scrolling for better UX */
+  html {
+    scroll-behavior: smooth;
+    /* Hide scrollbar for html */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow-x: hidden;
+  }
+
+  html::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Ensure full height for mobile */
+  #root {
+    min-height: 100vh;
+    min-height: 100dvh;
+    /* Hide scrollbar for root */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  #root::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Custom agricultural gradients - updated for dark mode */
+  .agri-gradient {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  }
+
+  .dark .agri-gradient {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  }
+
+  .agri-gradient-warm {
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  }
+
+  .dark .agri-gradient-warm {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  }
+
+  .agri-gradient-earth {
+    background: linear-gradient(135deg, #a16207 0%, #92400e 100%);
+  }
+
+  .dark .agri-gradient-earth {
+    background: linear-gradient(135deg, #92400e 0%, #78350f 100%);
+  }
+
+  /* High contrast focus indicators for accessibility */
+  .focus-visible:focus {
+    @apply ring-2 ring-primary ring-offset-2 outline-none;
+  }
+
+  .dark .focus-visible:focus {
+    @apply ring-offset-background;
+  }
+
+  /* Custom button press animations */
+  .btn-press {
+    transition: transform 0.1s ease-in-out;
+  }
+
+  .btn-press:active {
+    transform: scale(0.95);
+  }
+
+  /* Optimized for touch devices */
+  @media (hover: none) and (pointer: coarse) {
+    .hover\:shadow-lg:hover {
+      box-shadow:
+        0 10px 15px -3px rgb(0 0 0 / 0.1),
+        0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+  }
+}
+
+@layer components {
+  /* Farm-themed card styles - updated for dark mode */
+  .farm-card {
+    @apply bg-card rounded-lg shadow-sm border border-border p-4 hover:shadow-md transition-all duration-300;
+  }
+
+  .dark .farm-card {
+    @apply shadow-lg hover:shadow-xl;
+  }
+
+  .farm-card-header {
+    @apply flex items-center space-x-3 mb-3;
+  }
+
+  .farm-icon {
+    @apply w-10 h-10 rounded-full flex items-center justify-center;
+  }
+
+  /* Voice assistant pulse animation */
+  .voice-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .voice-pulse::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: inherit;
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+
+  /* Alert badges - updated for dark mode */
+  .alert-urgent {
+    @apply bg-red-100 text-red-800 border border-red-200;
+  }
+
+  .dark .alert-urgent {
+    @apply bg-red-950 text-red-300 border-red-800;
+  }
+
+  .alert-medium {
+    @apply bg-orange-100 text-orange-800 border border-orange-200;
+  }
+
+  .dark .alert-medium {
+    @apply bg-orange-950 text-orange-300 border-orange-800;
+  }
+
+  .alert-low {
+    @apply bg-green-100 text-green-800 border border-green-200;
+  }
+
+  .dark .alert-low {
+    @apply bg-green-950 text-green-300 border-green-800;
+  }
+
+  /* Farm Management cards background utility */
+  .farm-mgmt-bg {
+    background-color: hsl(var(--farm-mgmt));
+  }
+}
+
+/* Marquee utilities */
+@layer utilities {
+  .marquee {
+    @apply flex;
+    width: max-content;
+    animation-duration: 24s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  .marquee-left {
+    animation-name: marquee-left;
+  }
+  .marquee-right {
+    animation-name: marquee-right;
+  }
+}
+
+@keyframes marquee-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marquee-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    animation-duration: 0s !important;
+    animation-iteration-count: 0 !important;
+  }
+}
+
+/* Image optimization utilities */
+@layer utilities {
+  .image-crisp {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+
+  .image-smooth {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: smooth;
+  }
+
+  .aspect-video {
+    aspect-ratio: 16 / 9;
+  }
+
+  .aspect-square {
+    aspect-ratio: 1 / 1;
+  }
+
+  .aspect-photo {
+    aspect-ratio: 4 / 3;
+  }
+
+  .object-cover-center {
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .object-contain-center {
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
+/* Progressive image loading animations */
+@layer components {
+  .progressive-image {
+    @apply relative overflow-hidden;
+  }
+
+  .progressive-image-placeholder {
+    @apply absolute inset-0 bg-gradient-to-br from-muted to-muted/80 animate-pulse;
+  }
+
+  .progressive-image-blur {
+    filter: blur(5px);
+    transform: scale(1.05);
+    transition:
+      filter 0.3s ease-out,
+      transform 0.3s ease-out;
+  }
+
+  .progressive-image-loaded {
+    filter: blur(0);
+    transform: scale(1);
+  }
+
+  /* Image error fallback */
+  .image-error {
+    @apply flex items-center justify-center bg-muted text-muted-foreground text-sm min-h-[100px];
+  }
+
+  .image-error::after {
+    content: "🖼️ Image not available";
+  }
+}

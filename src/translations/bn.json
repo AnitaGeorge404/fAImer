@@ -1,0 +1,19 @@
+{
+  "welcome": "প্রকল্প কিষাণে আপনাকে স্বাগতম",
+  "phone_login": "ফোন লগিন",
+  "enter_phone": "আপনার ফোন নম্বর লিখুন",
+  "send_otp": "ওটিপি পাঠান",
+  "verify_login": "যাচাই করুন ও লগিন",
+  "voice_recognition": "ভয়েস রিকগনিশন",
+  "fingerprint_login": "ফিঙ্গারপ্রিন্ট লগিন",
+  "back_to_phone": "ফোন নম্বরে ফিরে যান",
+  "enter_otp": "৬-সংখ্যার ওটিপি লিখুন",
+  "having_trouble": "সমস্যা হচ্ছে? SMS লগিন চেষ্টা করুন।",
+  "home": "হোম",
+  "notifications": "বিজ্ঞপ্তি",
+  "profile": "প্রোফাইল",
+  "chatbot": "সহায়ক",
+  "twin": "ফার্ম টুইন",
+  "resources": "রিসোর্স",
+  "updates": "আপডেট"
+}

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap"
+      rel="stylesheet"
+    />
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VayalCare - Your Personal Farming Assistant</title>
+    <meta
+      name="description"
+      content="VayalCare - A comprehensive farming assistant app for Indian farmers with voice-first, multilingual support and rural-friendly UX"
+    />
+    <meta name="author" content="VayalCare Team" />
+
+    <meta
+      property="og:title"
+      content="VayalCare - Your Personal Farming Assistant"
+    />
+    <meta
+      property="og:description"
+      content="Comprehensive farming assistant app designed for Indian farmers with voice-first capabilities and multilingual support"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://lovable.dev/opengraph-image-p98pqg.png"
+    />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@lovable_dev" />
+    <meta
+      name="twitter:image"
+      content="https://lovable.dev/opengraph-image-p98pqg.png"
+    />
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#16a34a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="VayalCare" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- PWA Icons -->
+    <link
+      rel="icon"
+      href="/lovable-uploads/852b0cb2-1c40-4d2d-9582-b65109704e1a.png"
+      type="image/png"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="/lovable-uploads/852b0cb2-1c40-4d2d-9582-b65109704e1a.png"
+    />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Google Fonts for better typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if (
+        "serviceWorker" in navigator &&
+        !window.location.hostname.includes("localhost")
+      ) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").then(
+            function (registration) {
+              console.log("SW registered: ", registration);
+            },
+            function (registrationError) {
+              console.log("SW registration failed: ", registrationError);
+            }
+          );
+        });
+      }
+    </script>
+  </body>
+</html>

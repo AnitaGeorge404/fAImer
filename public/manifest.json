@@ -1,0 +1,37 @@
+{
+  "name": "VayalCare - Your Personal Farming Assistant",
+  "short_name": "VayalCare",
+  "description": "A comprehensive farming assistant app for Indian farmers with voice-first, multilingual support and rural-friendly UX",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["agriculture", "productivity", "business"],
+  "icons": [
+    {
+      "src": "/lovable-uploads/852b0cb2-1c40-4d2d-9582-b65109704e1a.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/lovable-uploads/852b0cb2-1c40-4d2d-9582-b65109704e1a.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/lovable-uploads/852b0cb2-1c40-4d2d-9582-b65109704e1a.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
