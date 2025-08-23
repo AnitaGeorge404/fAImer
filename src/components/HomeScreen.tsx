@@ -580,17 +580,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       icon: Map,
       image: "/lovable-uploads/33d82a5a-6adb-4fb2-a720-33afcbfb4f47.png",
     },
-    {
-      id: "seeding",
-      label: language === "ml" ? "വിത്തിടൽ" : "Price Beacon",
-      icon: Wheat,
-      image: "/lovable-uploads/4cf4c0b1-effa-45dd-a1c2-b857aecd3957.png",
-    },
-    {
-      id: "support",
-      label: language === "ml" ? "സപ്പോർട്ട്" : "Support",
-      icon: LifeBuoy,
-    },
   ];
 
   // Feature content cards with custom generated images
@@ -859,16 +848,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       <div className="p-4 space-y-6">
         {/* Quick Actions */}
         <div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             {quickActions.slice(0, 3).map((action) => {
               const Icon = action.icon;
               return (
                 <button
                   key={action.id}
                   onClick={() => {
-                    // Handle Fair Farm navigation
+                    // Handle CropWise and Fair Farm navigation
                     if (action.id === "mapping") {
                       onFeatureClick("fairfarm");
+                    } else if (action.id === "spraying") {
+                      onFeatureClick("cropwise");
                     } else {
                       // Show placeholder toast for other actions
                       toast({
@@ -932,7 +923,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
                       width: idx % 2 === 0 ? "40cqw" : "60cqw",
                     }}
                   >
-                    <Card className="overflow-hidden hover:shadow-lg transition-shadow rounded-md h-full">
+                    <Card
+                      className="overflow-hidden hover:shadow-lg transition-shadow rounded-md h-full cursor-pointer"
+                      onClick={() => onFeatureClick("knowledge")}
+                    >
                       <div className="bg-muted relative h-28 md:h-32">
                         <img
                           src={item.image}
@@ -971,7 +965,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
                       width: idx % 2 === 0 ? "40cqw" : "60cqw",
                     }}
                   >
-                    <Card className="overflow-hidden hover:shadow-lg transition-shadow rounded-md h-full">
+                    <Card
+                      className="overflow-hidden hover:shadow-lg transition-shadow rounded-md h-full cursor-pointer"
+                      onClick={() => onFeatureClick("knowledge")}
+                    >
                       <div className="bg-muted relative h-28 md:h-32">
                         <img
                           src={item.image}

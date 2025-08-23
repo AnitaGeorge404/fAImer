@@ -8,7 +8,7 @@ import {
   Newspaper,
   FileText,
   Users,
-  } from "lucide-react";
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 interface KnowledgeCenterScreenProps {
@@ -85,7 +85,6 @@ const KnowledgeCenterScreen: React.FC<KnowledgeCenterScreenProps> = ({
               image:
                 "/lovable-uploads/87bc0776-6ff4-4209-a8b5-8b0c47dc938a.png",
             },
-            { id: 'companion', icon: BookOpen, label: 'Crop Companion' },
           ].map((tool) => {
             const Icon = tool.icon;
             return (

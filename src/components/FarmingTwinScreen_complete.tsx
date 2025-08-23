@@ -43,13 +43,13 @@ const FarmingTwinScreen: React.FC<FarmingTwinScreenProps> = ({ onBack }) => {
       startOnLoad: false,
       theme: "base",
       flowchart: {
-        useMaxWidth: true,
+        useMaxWidth: false,
         htmlLabels: true,
         curve: "cardinal",
-        padding: 20,
-        nodeSpacing: 40,
-        rankSpacing: 60,
-        diagramPadding: 20,
+        padding: 30,
+        nodeSpacing: 60,
+        rankSpacing: 100,
+        diagramPadding: 40,
       },
       themeVariables: {
         darkMode: false,
@@ -612,10 +612,9 @@ Return ONLY the mermaid flowchart code without any explanation or code blocks.`;
 
           // Configure SVG for zoom and scroll
           svgElement.style.display = "block";
-          svgElement.style.margin = "10px";
-          svgElement.style.width = "100%";
-          svgElement.style.maxWidth = "100%";
-          svgElement.style.minHeight = "400px";
+          svgElement.style.margin = "20px";
+          svgElement.style.minWidth = "800px";
+          svgElement.style.minHeight = "600px";
           svgElement.style.cursor = "grab";
           svgElement.style.userSelect = "none";
           svgElement.style.transformOrigin = "0 0";
@@ -953,12 +952,35 @@ Return ONLY the mermaid flowchart code without any explanation or code blocks.`;
                         Your Personalized Farming Roadmap
                       </Label>
                       <div className="border border-gray-200 dark:border-gray-300 rounded-lg overflow-hidden bg-white">
+                        <div className="bg-gray-100 px-4 py-2 border-b border-gray-200">
+                          <div className="flex items-center justify-between text-sm text-gray-700">
+                            <span>
+                              Use mouse wheel to zoom • Drag to pan • Touch
+                              gestures supported • Scroll to navigate
+                            </span>
+                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                              Interactive Diagram
+                            </span>
+                          </div>
+                        </div>
                         <div className="bg-white p-4 min-h-[600px] relative">
                           <div
                             ref={mermaidRef}
                             className="w-full h-full bg-white rounded-lg"
                           ></div>
                         </div>
+                      </div>
+
+                      <div className="p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded">
+                        <h4 className="font-medium text-green-800 dark:text-green-300 mb-2">
+                          🎯 Roadmap Generated Successfully!
+                        </h4>
+                        <p className="text-sm text-green-700 dark:text-green-300">
+                          This interactive flowchart shows your complete farming
+                          journey with timelines, costs, and key decision points
+                          generated in your input language. Use zoom and pan to
+                          explore details.
+                        </p>
                       </div>
                     </div>
                   )}

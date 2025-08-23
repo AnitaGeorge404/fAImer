@@ -32,8 +32,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack }) => {
     location: "Mysore, Karnataka",
     farmSize: "2.5 acres",
     soilType: "Red Soil",
-    experience: "15 years",
-    language: "Kannada",
+    experience: "5 years",
+    language: "Malayalam",
     aiLevel: "Intermediate",
   };
 
