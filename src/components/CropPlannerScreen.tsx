@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Calendar,
   Plus,
@@ -208,6 +208,28 @@ const CropPlannerScreen: React.FC<CropPlannerScreenProps> = ({ onBack }) => {
     crop: "",
     area: "",
   });
+
+  // Load crop plans from localStorage on mount
+  useEffect(() => {
+    const savedPlans = localStorage.getItem("cropPlans");
+    if (savedPlans) {
+      try {
+        const plans = JSON.parse(savedPlans);
+        if (Array.isArray(plans) && plans.length > 0) {
+          setCropPlans(plans);
+        }
+      } catch (error) {
+        console.error("Error loading crop plans:", error);
+      }
+    }
+  }, []);
+
+  // Save crop plans to localStorage whenever they change
+  useEffect(() => {
+    if (cropPlans.length > 0) {
+      localStorage.setItem("cropPlans", JSON.stringify(cropPlans));
+    }
+  }, [cropPlans]);
 
   // Advanced calculation functions
   const parseArea = (areaString: string): number => {

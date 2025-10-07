@@ -607,7 +607,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     },
     {
       id: "twin",
-      title: getTranslatedText("Farming Twin"),
+      title: getTranslatedText("Crop Guide"),
       icon: Users,
       color:
         "bg-purple-100 text-purple-600 dark:bg-purple-950 dark:text-purple-300",
@@ -1054,7 +1054,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
               onFeatureClick("twin");
               toast({
                 title: getVoiceText("navigating"),
-                description: `${currentLanguage === "ml" ? "കാർഷിക ട്വിൻ" : "Farming Twin"} • ${(decision.confidence * 100).toFixed(0)}%`,
+                description: `${currentLanguage === "ml" ? "വിള ഗൈഡ്" : "Crop Guide"} • ${(decision.confidence * 100).toFixed(0)}%`,
               });
             }
             break;

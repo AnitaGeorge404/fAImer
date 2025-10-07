@@ -29,7 +29,7 @@ Supports 8 Indian languages with natural speech recognition:
 
 Goes beyond simple screen navigation to handle:
 
-- **Tabs within features** (e.g., "recommendations" tab in Farming Twin)
+- **Tabs within features** (e.g., "recommendations" tab in Crop Guide)
 - **Popups and modals** (e.g., current weather popup)
 - **Specific functionality** within screens
 
@@ -83,9 +83,9 @@ User: "ഹോം" → Home screen (Malayalam)
 ### Sub-Action Navigation
 
 ```
-User: "show me crop recommendations" → Twin screen, Recommendations tab
-User: "വിള ശുപാർശകൾ കാണിക്കുക" → Twin screen, Recommendations tab (Malayalam)
-User: "open farming twin" → Twin screen, main dashboard
+User: "show me crop recommendations" → Crop Guide screen, Recommendations tab
+User: "വിള ശുപാർശകൾ കാണിക്കുക" → Crop Guide screen, Recommendations tab (Malayalam)
+User: "open crop guide" → Crop Guide screen, main dashboard
 ```
 
 ### Weather Queries
@@ -161,7 +161,7 @@ const handleVoiceNavigation = async (decision: VoiceDecision) => {
 ### Main Features
 
 - **home**: Dashboard and main screen
-- **twin**: Farming Twin (digital farm simulation)
+- **twin**: Crop Guide (digital farming assistant)
   - Sub-actions: `twin`, `recommendations`
 - **profile**: User profile and settings
 - **diagnose**: Crop disease diagnosis

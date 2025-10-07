@@ -29,8 +29,13 @@ interface FarmingTwinScreenProps {
   activeTab?: "twin" | "recommendations";
 }
 
-const FarmingTwinScreen: React.FC<FarmingTwinScreenProps> = ({ onBack, activeTab = "twin" }) => {
-  const [currentTab, setCurrentTab] = useState<"twin" | "recommendations">(activeTab);
+const FarmingTwinScreen: React.FC<FarmingTwinScreenProps> = ({
+  onBack,
+  activeTab = "twin",
+}) => {
+  const [currentTab, setCurrentTab] = useState<"twin" | "recommendations">(
+    activeTab
+  );
   const [showRoadmapDialog, setShowRoadmapDialog] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [transcribedText, setTranscribedText] = useState("");
@@ -811,13 +816,13 @@ Return ONLY the mermaid flowchart code without any explanation or code blocks.`;
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-xl font-bold">Farming Twin</h1>
+            <h1 className="text-xl font-bold">Crop Guide</h1>
             <p className="text-green-100 dark:text-green-200 text-sm">
               AI-powered farming guidance and recommendations
             </p>
           </div>
         </div>
-        
+
         {/* Tabs */}
         <div className="flex border-t border-white/20">
           <button
@@ -849,156 +854,157 @@ Return ONLY the mermaid flowchart code without any explanation or code blocks.`;
       {currentTab === "twin" && (
         <div className="p-4 space-y-4">
           {/* Farming Roadmap Generator */}
-        <Card className="dark:bg-card dark:border-border shadow-sm dark:shadow-lg transition-all duration-300">
-          <CardHeader>
-            <CardTitle className="text-base text-foreground flex items-center gap-2">
-              <Lightbulb className="h-5 w-5 text-yellow-500" />
-              AI Farming Roadmap Generator
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-gray-600 dark:text-muted-foreground mb-4">
-              Get a comprehensive crop-specific farming mind map with voice or
-              text input in English or Malayalam. Our AI analyzes your specific
-              crop and generates a detailed roadmap covering variety selection,
-              soil preparation, planting, pest management, harvesting, and
-              post-harvest processing with timelines and best practices. The
-              diagram will be generated in the same language as your input.
-            </p>
-            <Dialog
-              open={showRoadmapDialog}
-              onOpenChange={setShowRoadmapDialog}
-            >
-              <DialogTrigger asChild>
-                <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Generate Farming Roadmap
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-5xl max-h-[95vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Lightbulb className="h-5 w-5 text-yellow-500" />
-                    AI Farming Roadmap Generator
-                  </DialogTitle>
-                  <DialogDescription>
-                    Describe your specific crop (e.g., tomato, wheat, rice)
-                    using voice or text in English or Malayalam. Our AI will
-                    create a comprehensive farming mind map tailored to your
-                    crop in the same language as your input, including variety
-                    selection, growing stages, pest management, fertilization
-                    schedules, and harvesting techniques with exact timelines.
-                  </DialogDescription>
-                </DialogHeader>
+          <Card className="dark:bg-card dark:border-border shadow-sm dark:shadow-lg transition-all duration-300">
+            <CardHeader>
+              <CardTitle className="text-base text-foreground flex items-center gap-2">
+                <Lightbulb className="h-5 w-5 text-yellow-500" />
+                AI Farming Roadmap Generator
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-600 dark:text-muted-foreground mb-4">
+                Get a comprehensive crop-specific farming mind map with voice or
+                text input in English or Malayalam. Our AI analyzes your
+                specific crop and generates a detailed roadmap covering variety
+                selection, soil preparation, planting, pest management,
+                harvesting, and post-harvest processing with timelines and best
+                practices. The diagram will be generated in the same language as
+                your input.
+              </p>
+              <Dialog
+                open={showRoadmapDialog}
+                onOpenChange={setShowRoadmapDialog}
+              >
+                <DialogTrigger asChild>
+                  <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white">
+                    <FileText className="h-4 w-4 mr-2" />
+                    Generate Farming Roadmap
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-5xl max-h-[95vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                      <Lightbulb className="h-5 w-5 text-yellow-500" />
+                      AI Farming Roadmap Generator
+                    </DialogTitle>
+                    <DialogDescription>
+                      Describe your specific crop (e.g., tomato, wheat, rice)
+                      using voice or text in English or Malayalam. Our AI will
+                      create a comprehensive farming mind map tailored to your
+                      crop in the same language as your input, including variety
+                      selection, growing stages, pest management, fertilization
+                      schedules, and harvesting techniques with exact timelines.
+                    </DialogDescription>
+                  </DialogHeader>
 
-                <div className="space-y-6">
-                  {/* Voice Input Section */}
-                  <div className="space-y-4">
-                    <Label className="text-sm font-medium">Voice Input</Label>
-                    <div className="flex items-center gap-4">
-                      <Button
-                        onClick={isRecording ? stopRecording : startRecording}
-                        className={`${
-                          isRecording
-                            ? "bg-red-600 hover:bg-red-700 animate-pulse"
-                            : "bg-blue-600 hover:bg-blue-700"
-                        } text-white`}
-                        disabled={isGenerating}
-                      >
-                        {isRecording ? (
-                          <>
-                            <MicOff className="h-4 w-4 mr-2" />
-                            Stop Recording
-                          </>
-                        ) : (
-                          <>
-                            <Mic className="h-4 w-4 mr-2" />
-                            Start Recording
-                          </>
-                        )}
-                      </Button>
-
-                      {audioBlob && !isRecording && (
+                  <div className="space-y-6">
+                    {/* Voice Input Section */}
+                    <div className="space-y-4">
+                      <Label className="text-sm font-medium">Voice Input</Label>
+                      <div className="flex items-center gap-4">
                         <Button
-                          onClick={transcribeAudio}
-                          className="bg-green-600 hover:bg-green-700 text-white"
+                          onClick={isRecording ? stopRecording : startRecording}
+                          className={`${
+                            isRecording
+                              ? "bg-red-600 hover:bg-red-700 animate-pulse"
+                              : "bg-blue-600 hover:bg-blue-700"
+                          } text-white`}
                           disabled={isGenerating}
                         >
-                          <PlayCircle className="h-4 w-4 mr-2" />
-                          Process Audio
+                          {isRecording ? (
+                            <>
+                              <MicOff className="h-4 w-4 mr-2" />
+                              Stop Recording
+                            </>
+                          ) : (
+                            <>
+                              <Mic className="h-4 w-4 mr-2" />
+                              Start Recording
+                            </>
+                          )}
                         </Button>
+
+                        {audioBlob && !isRecording && (
+                          <Button
+                            onClick={transcribeAudio}
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                            disabled={isGenerating}
+                          >
+                            <PlayCircle className="h-4 w-4 mr-2" />
+                            Process Audio
+                          </Button>
+                        )}
+                      </div>
+
+                      {isRecording && (
+                        <div className="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded">
+                          <div className="flex items-center">
+                            <div className="w-3 h-3 bg-red-600 rounded-full animate-pulse mr-2"></div>
+                            <span className="text-sm text-red-800 dark:text-red-300">
+                              Recording... Speak clearly about your farming
+                              plans in English or Malayalam
+                            </span>
+                          </div>
+                        </div>
                       )}
                     </div>
 
-                    {isRecording && (
-                      <div className="p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 rounded">
-                        <div className="flex items-center">
-                          <div className="w-3 h-3 bg-red-600 rounded-full animate-pulse mr-2"></div>
-                          <span className="text-sm text-red-800 dark:text-red-300">
-                            Recording... Speak clearly about your farming plans
-                            in English or Malayalam
-                          </span>
+                    {/* Text Input Section */}
+                    <div className="space-y-4">
+                      <Label
+                        htmlFor="crop-description"
+                        className="text-sm font-medium"
+                      >
+                        Or Type Your Farming Plan
+                      </Label>
+                      <Textarea
+                        id="crop-description"
+                        placeholder="English: I want to grow tomatoes in 2 acres, what are the complete steps, timeline, costs, and profit expectations? | Malayalam: 2 ഏക്കറിൽ തക്കാളി കൃഷി ചെയ്യാൻ ആഗ്രഹിക്കുന്നു, സമ്പൂർണ്ണ ഘട്ടങ്ങൾ, സമയക്രമം, ചെലവുകൾ, ലാഭ പ്രതീക്ഷകൾ എന്നിവ എന്തെല്ലാം?"
+                        value={transcribedText}
+                        onChange={(e) => setTranscribedText(e.target.value)}
+                        className="min-h-20"
+                        disabled={isGenerating}
+                      />
+                      <Button
+                        onClick={handleManualGeneration}
+                        className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                        disabled={!transcribedText.trim() || isGenerating}
+                      >
+                        {isGenerating ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            Generating Roadmap...
+                          </>
+                        ) : (
+                          <>
+                            <TrendingUp className="h-4 w-4 mr-2" />
+                            Generate Roadmap
+                          </>
+                        )}
+                      </Button>
+                    </div>
+
+                    {/* Roadmap Display */}
+                    {roadmapData && (
+                      <div className="space-y-4">
+                        <Label className="text-sm font-medium">
+                          Your Personalized Farming Roadmap
+                        </Label>
+                        <div className="border border-gray-200 dark:border-gray-300 rounded-lg overflow-hidden bg-white">
+                          <div className="bg-white p-4 min-h-[600px] relative">
+                            <div
+                              ref={mermaidRef}
+                              className="w-full h-full bg-white rounded-lg"
+                            ></div>
+                          </div>
                         </div>
                       </div>
                     )}
                   </div>
-
-                  {/* Text Input Section */}
-                  <div className="space-y-4">
-                    <Label
-                      htmlFor="crop-description"
-                      className="text-sm font-medium"
-                    >
-                      Or Type Your Farming Plan
-                    </Label>
-                    <Textarea
-                      id="crop-description"
-                      placeholder="English: I want to grow tomatoes in 2 acres, what are the complete steps, timeline, costs, and profit expectations? | Malayalam: 2 ഏക്കറിൽ തക്കാളി കൃഷി ചെയ്യാൻ ആഗ്രഹിക്കുന്നു, സമ്പൂർണ്ണ ഘട്ടങ്ങൾ, സമയക്രമം, ചെലവുകൾ, ലാഭ പ്രതീക്ഷകൾ എന്നിവ എന്തെല്ലാം?"
-                      value={transcribedText}
-                      onChange={(e) => setTranscribedText(e.target.value)}
-                      className="min-h-20"
-                      disabled={isGenerating}
-                    />
-                    <Button
-                      onClick={handleManualGeneration}
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-                      disabled={!transcribedText.trim() || isGenerating}
-                    >
-                      {isGenerating ? (
-                        <>
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                          Generating Roadmap...
-                        </>
-                      ) : (
-                        <>
-                          <TrendingUp className="h-4 w-4 mr-2" />
-                          Generate Roadmap
-                        </>
-                      )}
-                    </Button>
-                  </div>
-
-                  {/* Roadmap Display */}
-                  {roadmapData && (
-                    <div className="space-y-4">
-                      <Label className="text-sm font-medium">
-                        Your Personalized Farming Roadmap
-                      </Label>
-                      <div className="border border-gray-200 dark:border-gray-300 rounded-lg overflow-hidden bg-white">
-                        <div className="bg-white p-4 min-h-[600px] relative">
-                          <div
-                            ref={mermaidRef}
-                            className="w-full h-full bg-white rounded-lg"
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
-          </CardContent>
-        </Card>
+                </DialogContent>
+              </Dialog>
+            </CardContent>
+          </Card>
         </div>
       )}
 

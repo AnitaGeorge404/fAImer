@@ -337,17 +337,17 @@ export const FEATURE_KB: Array<{
   },
   {
     id: "twin",
-    title: "Farming Twin",
+    title: "Crop Guide",
     description:
-      "Digital twin of your farm for monitoring and insights. Has tabs: 'twin' for main dashboard and 'recommendations' for crop recommendations.",
+      "Crop guide for monitoring and insights. Has tabs: 'twin' for main dashboard and 'recommendations' for crop recommendations.",
     examples: [
-      "open farm twin",
-      "digital twin",
-      "twin dashboard",
+      "open crop guide",
+      "crop guide",
+      "guide dashboard",
       "crop recommendations",
       "show recommendations",
       "farming suggestions",
-      "ഫാം ട്വിൻ തുറക്കുക",
+      "വിള ഗൈഡ് തുറക്കുക",
       "ഡിജിറ്റൽ ട്വിൻ",
       "കാർഷിക ട്വിൻ",
       "recommendations tab",
@@ -969,7 +969,7 @@ English:
 "It's been raining a lot, will it continue?" → INTENT: Weather forecast → targetId: "weather"
 "Show me my profile" → INTENT: View profile → targetId: "profile"
 "Take me to home" → INTENT: Go home → targetId: "home"
-"Open farming twin" → INTENT: Farming twin → targetId: "twin"
+"Open crop guide" → INTENT: Crop guide → targetId: "twin"
 
 Malayalam:
 "എന്റെ പയറിന് വെള്ളക്കാശു വന്നിട്ടുണ്ട്" → INTENT: Plant disease → targetId: "diagnose"
@@ -981,8 +981,8 @@ Malayalam:
 "ഹോം" → INTENT: Home → targetId: "home"
 "ഹോം പേജ്" → INTENT: Home → targetId: "home"
 "വീട്ടിലേക്ക് പോകുക" → INTENT: Home → targetId: "home"
-"കാർഷിക ട്വിൻ" → INTENT: Farming twin → targetId: "twin"
-"ട്വിൻ" → INTENT: Farming twin → targetId: "twin"
+"വിള ഗൈഡ്" → INTENT: Crop guide → targetId: "twin"
+"ഗൈഡ്" → INTENT: Crop guide → targetId: "twin"
 "വിള പരിശോധന" → INTENT: Crop diagnosis → targetId: "diagnose"
 "രോഗനിർണയം" → INTENT: Crop diagnosis → targetId: "diagnose"
 "വിപണി" → INTENT: Market → targetId: "market"
@@ -1029,7 +1029,7 @@ NAVIGATION PATTERNS (Malayalam/Hindi/English):
 - Market words: "വിപണി", "market", "बाज़ार", "मंडी" → "market"
 - Weather words: "കാലാവസ്ഥ", "weather", "मौसम" → "weather"
 - Alert words: "അലർട്ട്", "മുന്നറിയിപ്പ്", "alert", "अलर्ट", "चेतावनी" → "notifications"
-- Twin words: "ട്വിൻ", "കാർഷിക ട്വിൻ", "twin", "farming twin", "ट्विन" → "twin"
+- Guide words: "ഗൈഡ്", "വിള ഗൈഡ്", "guide", "crop guide", "गाइड" → "twin"
 - Expense words: "ചെലവ്", "ചിലവ്", "expense", "खर्च", "लागत" → "expense"
 - Knowledge words: "വിജ്ഞാനം", "അറിവ്", "knowledge", "ज्ञान", "जानकारी" → "knowledge"
 
@@ -1192,15 +1192,15 @@ export function offlineMatch(
         target: "twin",
         subAction: "recommendations",
       },
-      // Twin main dashboard
+      // Crop Guide main dashboard
       {
         keys: [
-          "twin",
-          "digital",
-          "ട്വിൻ",
-          "ഡിജിറ്റൽ",
-          "farming twin",
-          "കാർഷിക ട്വിൻ",
+          "guide",
+          "crop guide",
+          "ഗൈഡ്",
+          "വിള ഗൈഡ്",
+          "farming guide",
+          "कृषि गाइड",
         ],
         target: "twin",
         subAction: "twin",

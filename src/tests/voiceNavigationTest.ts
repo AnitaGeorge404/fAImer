@@ -34,9 +34,9 @@ export const testCases = [
     description: "Twin recommendations tab",
   },
   {
-    input: "open farming twin",
+    input: "open crop guide",
     expected: { action: "navigate", targetId: "twin" },
-    description: "Main twin dashboard",
+    description: "Main crop guide dashboard",
   },
   {
     input: "വിള ശുപാർശകൾ കാണിക്കുക",
