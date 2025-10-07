@@ -99,7 +99,7 @@ export async function getAIResponse(
 }> {
   const {
     maxTokens = 200,
-    model = "gemini-1.5-flash",
+    model = "gemini-2.5-flash",
     forceOffline = false,
   } = options;
 

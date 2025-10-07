@@ -506,7 +506,7 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
 
       const response = await getAIResponse(farmingPrompt, {
         maxTokens: 300,
-        model: "gemini-1.5-flash",
+        model: "gemini-2.5-flash",
       });
 
       const assistantMessage: Message = {

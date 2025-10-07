@@ -135,7 +135,7 @@ const BuyInputsScreen: React.FC<BuyInputsScreenProps> = ({ onBack }) => {
     }
 
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
       const updatedInputs = await Promise.all(
         staticInputs.map(async (item) => {
