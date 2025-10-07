@@ -81,8 +81,11 @@ const MultiScanScreen: React.FC<MultiScanScreenProps> = ({ onBack }) => {
 
       {/* Fixed Tab Switcher - positioned just below header */}
       <div className="fixed top-[72px] left-0 right-0 z-20 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
-        <div className="flex items-center justify-center p-2">
-          <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-full p-1 gap-1 shadow-sm">
+        <div
+          className="flex items-center justify-center p-2"
+          style={{ marginTop: "1vh" }}
+        >
+          <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-full p-1 gap-1 ">
             {tabs.map((t) => (
               <button
                 key={t.id}
