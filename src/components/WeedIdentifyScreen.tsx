@@ -296,6 +296,30 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({ onBack }) => {
       </div>
 
       <div className="p-4 space-y-4">
+        {/* Tips */}
+        <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+          <CardContent className="p-4">
+            <div className="flex items-start">
+              <Lightbulb className="h-5 w-5 text-yellow-500 dark:text-yellow-400 mr-3 mt-0.5" />
+              <div>
+                <h4 className="font-medium text-gray-800 dark:text-white mb-2">
+                  Pro Tips for Better Identification:
+                </h4>
+                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                  <li>• Take clear, close-up photos of the entire weed</li>
+                  <li>
+                    • Ensure good lighting to capture leaf and stem details
+                  </li>
+                  <li>• Include the flower or seed head if present</li>
+                  <li>• Capture both leaf structure and growth pattern</li>
+                  <li>• Take photos of the root system if possible</li>
+                  <li>• Avoid blurry or dark images for best results</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
           <CardHeader>
             <CardTitle className="text-base flex items-center dark:text-white">
@@ -385,6 +409,40 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({ onBack }) => {
                 </Button>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Common Weeds */}
+        <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="text-base dark:text-white">
+              Common Weeds in Your Region
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {commonWeeds.map((weed, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                >
+                  <div className="flex items-center">
+                    <span className="text-2xl mr-3">{weed.icon}</span>
+                    <div>
+                      <p className="font-medium text-gray-800 dark:text-white">
+                        {weed.name}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-300">
+                        Affects: {weed.crop}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge className={getSeverityColor(weed.severity)}>
+                    {weed.severity}
+                  </Badge>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
@@ -508,64 +566,6 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({ onBack }) => {
             </div>
           </>
         )}
-
-        {/* Common Weeds */}
-        <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
-          <CardHeader>
-            <CardTitle className="text-base dark:text-white">
-              Common Weeds in Your Region
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {commonWeeds.map((weed, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
-                >
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-3">{weed.icon}</span>
-                    <div>
-                      <p className="font-medium text-gray-800 dark:text-white">
-                        {weed.name}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-300">
-                        Affects: {weed.crop}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge className={getSeverityColor(weed.severity)}>
-                    {weed.severity}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Tips */}
-        <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
-          <CardContent className="p-4">
-            <div className="flex items-start">
-              <Lightbulb className="h-5 w-5 text-yellow-500 dark:text-yellow-400 mr-3 mt-0.5" />
-              <div>
-                <h4 className="font-medium text-gray-800 dark:text-white mb-2">
-                  Pro Tips for Better Identification:
-                </h4>
-                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
-                  <li>• Take clear, close-up photos of the entire weed</li>
-                  <li>
-                    • Ensure good lighting to capture leaf and stem details
-                  </li>
-                  <li>• Include the flower or seed head if present</li>
-                  <li>• Capture both leaf structure and growth pattern</li>
-                  <li>• Take photos of the root system if possible</li>
-                  <li>• Avoid blurry or dark images for best results</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       <canvas ref={canvasRef} className="hidden" />

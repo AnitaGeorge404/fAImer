@@ -387,6 +387,26 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({ onBack }) => {
       </div>
 
       <div className="p-4 space-y-4">
+        {/* Tips */}
+        <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+          <CardContent className="p-4">
+            <div className="flex items-start">
+              <Lightbulb className="h-5 w-5 text-yellow-500 dark:text-yellow-400 mr-3 mt-0.5" />
+              <div>
+                <h4 className="font-medium text-gray-800 dark:text-white mb-2">
+                  Pro Tips for Better Detection:
+                </h4>
+                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                  <li>• Take close-up photos of affected areas</li>
+                  <li>• Ensure good lighting for clear images</li>
+                  <li>• Include leaves, stems, or fruits showing damage</li>
+                  <li>• Check during early morning for best results</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Scan Section */}
         <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
           <CardHeader>
@@ -483,6 +503,48 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({ onBack }) => {
                 </Button>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Common Pests */}
+        <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="text-base dark:text-white">
+              Common Pests in Your Region
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {commonPests.map((pest, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                >
+                  <div className="flex items-center">
+                    <span className="text-2xl mr-3">{pest.icon}</span>
+                    <div>
+                      <p className="font-medium text-gray-800 dark:text-white">
+                        {pest.name}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-300">
+                        Affects: {pest.crop}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge
+                    className={
+                      pest.severity === "High"
+                        ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                        : pest.severity === "Medium"
+                          ? "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300"
+                          : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                    }
+                  >
+                    {pest.severity}
+                  </Badge>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
 
@@ -670,68 +732,6 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({ onBack }) => {
             )}
           </>
         )}
-
-        {/* Common Pests */}
-        <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
-          <CardHeader>
-            <CardTitle className="text-base dark:text-white">
-              Common Pests in Your Region
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {commonPests.map((pest, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
-                >
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-3">{pest.icon}</span>
-                    <div>
-                      <p className="font-medium text-gray-800 dark:text-white">
-                        {pest.name}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-300">
-                        Affects: {pest.crop}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge
-                    className={
-                      pest.severity === "High"
-                        ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                        : pest.severity === "Medium"
-                          ? "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300"
-                          : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                    }
-                  >
-                    {pest.severity}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Tips */}
-        <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
-          <CardContent className="p-4">
-            <div className="flex items-start">
-              <Lightbulb className="h-5 w-5 text-yellow-500 dark:text-yellow-400 mr-3 mt-0.5" />
-              <div>
-                <h4 className="font-medium text-gray-800 dark:text-white mb-2">
-                  Pro Tips for Better Detection:
-                </h4>
-                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
-                  <li>• Take close-up photos of affected areas</li>
-                  <li>• Ensure good lighting for clear images</li>
-                  <li>• Include leaves, stems, or fruits showing damage</li>
-                  <li>• Check during early morning for best results</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
