@@ -102,7 +102,7 @@ Focus on schemes that are currently accepting applications or are ongoing progra
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
       const response = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
         {
           method: "POST",
           headers: {
@@ -207,7 +207,7 @@ Source information from:
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
       const response = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
         {
           method: "POST",
           headers: {

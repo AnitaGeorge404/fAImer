@@ -125,7 +125,7 @@ const FarmingTwinScreen: React.FC<FarmingTwinScreenProps> = ({ onBack, activeTab
         const base64Audio = (reader.result as string).split(",")[1];
 
         const response = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
           {
             method: "POST",
             headers: {
@@ -212,7 +212,7 @@ Return as JSON:
 Infer reasonable defaults where information is not explicitly stated, but base everything on the user's actual input.`;
 
       const analysisResponse = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -317,7 +317,7 @@ Requirements:
 Return ONLY the mermaid flowchart code without any explanation or code blocks.`;
 
       const mermaidResponse = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

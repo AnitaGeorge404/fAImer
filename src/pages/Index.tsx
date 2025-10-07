@@ -17,6 +17,7 @@ import MultiScanScreen from "../components/MultiScanScreen";
 import ExpenseTrackerScreen from "../components/ExpenseTrackerScreen";
 import AgricultureNewsScreen from "../components/AgricultureNewsScreen";
 import GovtSchemesScreen from "../components/GovtSchemesScreen";
+import SoilAnalyzerScreen from "../components/SoilAnalyzerScreen";
 import LabourerHub from "../components/LabourerHub";
 import FairFarm from "../components/FairFarm";
 import BottomNavigation from "../components/BottomNavigation";
@@ -93,6 +94,8 @@ const Index = () => {
         return <MarketPricesScreen onBack={() => setActiveTab("home")} />;
       case "planner":
         return <CropPlannerScreen onBack={() => setActiveTab("home")} />;
+      case "soil-analyzer":
+        return <SoilAnalyzerScreen onBack={() => setActiveTab("home")} />;
       case "forum":
         return <FarmerForumScreen onBack={() => setActiveTab("home")} />;
       case "resources":

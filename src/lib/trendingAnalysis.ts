@@ -138,14 +138,38 @@ export class TrendingAnalyzer {
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);
 
-      const { data: alerts, error } = await supabase
-        .from("alerts")
-        .select("*")
-        .gte("created_at", weekAgo.toISOString())
-        .order("created_at", { ascending: false });
+      // Add timeout and retry logic for Supabase request
+      const fetchAlertsWithRetry = async (retries = 3): Promise<any> => {
+        for (let i = 0; i < retries; i++) {
+          try {
+            const result = await Promise.race([
+              supabase
+                .from("alerts")
+                .select("*")
+                .gte("created_at", weekAgo.toISOString())
+                .order("created_at", { ascending: false }),
+              new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Request timeout')), 10000)
+              )
+            ]) as any;
 
-      if (error || !alerts) {
-        console.error("❌ Error fetching alerts:", error);
+            if (result.error) {
+              throw result.error;
+            }
+            return result.data;
+          } catch (error) {
+            console.warn(`⚠️ Attempt ${i + 1} failed:`, error);
+            if (i === retries - 1) throw error;
+            // Wait before retry
+            await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+          }
+        }
+      };
+
+      const alerts = await fetchAlertsWithRetry();
+
+      if (!alerts) {
+        console.warn("⚠️ No alerts data received, returning empty array");
         return [];
       }
 

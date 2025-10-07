@@ -570,6 +570,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       "Market Prices": "വിപണി വിലകൾ",
       "Crop Planner": "വിള ആസൂത്രണം",
       "Farming Twin": "കാർഷിക ട്വിൻ",
+      "Soil Analyzer": "മണ്ണ് വിശകലനം",
       "Weather Alerts": "കാലാവസ്ഥാ മുന്നറിയിപ്പുകൾ",
       "Farmer Forum": "കർഷക ഫോറം",
       "Knowledge Center": "വിജ്ഞാന കേന്ദ്രം",
@@ -613,12 +614,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       image: "/lovable-uploads/0978174b-ae5f-40db-bd58-07833d59465a.png",
     },
     {
-      id: "twin",
-      title: getTranslatedText("Farming Twin"),
-      icon: Users,
+      id: "soil-analyzer",
+      title: getTranslatedText("Soil Analyzer"),
+      icon: TestTube,
       color:
-        "bg-purple-100 text-purple-600 dark:bg-purple-950 dark:text-purple-300",
-      image: "/lovable-uploads/0978174b-ae5f-40db-bd58-07833d59465a.png",
+        "bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-300",
+      image: "/lovable-uploads/f2bb06a9-32a5-4aa1-bf76-447eb1fb0c64.png",
     },
     {
       id: "forum",
@@ -1537,6 +1538,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
                       ) : feature.id === "twin" ? (
                         <img
                           src="/lovable-uploads/f9697d94-aedf-499f-93d5-7bcfe3319ac7.png"
+                          alt={`${feature.title} icon`}
+                          className="h-24 w-24 md:h-32 md:w-32 object-contain-center"
+                          loading="lazy"
+                        />
+                      ) : feature.id === "soil-analyzer" ? (
+                        <img
+                          src="/lovable-uploads/f2bb06a9-32a5-4aa1-bf76-447eb1fb0c64.png"
                           alt={`${feature.title} icon`}
                           className="h-24 w-24 md:h-32 md:w-32 object-contain-center"
                           loading="lazy"
