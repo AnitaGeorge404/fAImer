@@ -9,6 +9,7 @@ import {
   Loader2,
   CheckCircle,
   AlertCircle,
+  MapPin,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,9 +35,13 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
   const [selectedCrop, setSelectedCrop] = useState("");
   const [analysis, setAnalysis] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [uploadMethod, setUploadMethod] = useState<"file" | "manual" | "camera">("manual");
+  const [uploadMethod, setUploadMethod] = useState<
+    "file" | "manual" | "camera"
+  >("manual");
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
+  const [isFetchingLocation, setIsFetchingLocation] = useState(false);
+  const [locationFetched, setLocationFetched] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -46,26 +51,26 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
     { value: "wheat", label: "🌾 Wheat / ഗോതമ്പ്" },
     { value: "maize", label: "🌽 Maize / ചോളം" },
     { value: "millets", label: "🌾 Millets / തിനകൾ" },
-    
+
     // Spices
     { value: "pepper", label: "🌶️ Black Pepper / കുരുമുളക്" },
     { value: "cardamom", label: "🫘 Cardamom / ഏലം" },
     { value: "turmeric", label: "🟡 Turmeric / മഞ്ഞൾ" },
     { value: "ginger", label: "🫚 Ginger / ഇഞ്ചി" },
     { value: "chili", label: "🌶️ Chili / മുളക്" },
-    
+
     // Cash Crops
     { value: "coconut", label: "🥥 Coconut / തെങ്ങ്" },
     { value: "rubber", label: "🌳 Rubber / റബ്ബർ" },
     { value: "coffee", label: "☕ Coffee / കാപ്പി" },
     { value: "tea", label: "🍵 Tea / ചായ" },
-    
+
     // Fruits
     { value: "banana", label: "🍌 Banana / വാഴ്" },
     { value: "mango", label: "🥭 Mango / മാവ്" },
     { value: "jackfruit", label: "🍈 Jackfruit / ചക്ക" },
     { value: "papaya", label: "🧡 Papaya / പപ്പായ" },
-    
+
     // Vegetables
     { value: "tomato", label: "🍅 Tomato / തക്കാളി" },
     { value: "potato", label: "🥔 Potato / ഉരുളക്കിഴങ്ങ്" },
@@ -73,7 +78,7 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
     { value: "okra", label: "🫛 Okra / വെണ്ടക്ക" },
     { value: "eggplant", label: "🍆 Eggplant / വഴുതന" },
     { value: "cucumber", label: "🥒 Cucumber / വെള്ളരി" },
-    
+
     // Pulses & Legumes
     { value: "beans", label: "🫘 Beans / പയർ" },
     { value: "cowpea", label: "🫛 Cowpea / പയർ" },
@@ -94,14 +99,14 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
     const file = event.target.files?.[0];
     if (file) {
       setSelectedFile(file);
-      
+
       // Create preview of captured image
       const reader = new FileReader();
       reader.onload = (e) => {
         setCapturedImage(e.target?.result as string);
       };
       reader.readAsDataURL(file);
-      
+
       setIsCameraActive(false);
     }
   };
@@ -111,7 +116,7 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
     // Clear any previous captures
     setCapturedImage(null);
     setSelectedFile(null);
-    
+
     // Trigger the camera input
     if (cameraInputRef.current) {
       cameraInputRef.current.click();
@@ -123,13 +128,277 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
     setSelectedFile(null);
     setIsCameraActive(false);
     if (cameraInputRef.current) {
-      cameraInputRef.current.value = '';
+      cameraInputRef.current.value = "";
+    }
+  };
+
+  const fetchSoilFromLocation = async () => {
+    setIsFetchingLocation(true);
+    setLocationFetched(false);
+
+    try {
+      // Get user's current location
+      const position = await new Promise<GeolocationPosition>(
+        (resolve, reject) => {
+          if (!navigator.geolocation) {
+            reject(new Error("Geolocation is not supported by your browser"));
+            return;
+          }
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0,
+          });
+        }
+      );
+
+      const { latitude, longitude } = position.coords;
+      console.log("📍 Location obtained:", latitude, longitude);
+
+      // Try to fetch actual soil data from SoilGrids API
+      let soilDataFromAPI = null;
+      try {
+        console.log("🌍 Fetching soil data from SoilGrids (ISRIC)...");
+
+        const soilGridsResponse = await fetch(
+          `https://rest.isric.org/soilgrids/v2.0/properties/query?lon=${longitude}&lat=${latitude}&property=phh2o&property=nitrogen&property=soc&property=clay&property=sand&property=silt&depth=0-5cm&value=mean`,
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+            },
+          }
+        );
+
+        if (soilGridsResponse.ok) {
+          const data = await soilGridsResponse.json();
+          console.log("✅ SoilGrids data received:", data);
+
+          // Extract soil properties
+          const properties = data.properties?.layers;
+          if (properties) {
+            const ph = properties.phh2o?.depths?.[0]?.values?.mean
+              ? (properties.phh2o.depths[0].values.mean / 10).toFixed(1)
+              : null;
+            const clay = properties.clay?.depths?.[0]?.values?.mean
+              ? (properties.clay.depths[0].values.mean / 10).toFixed(1)
+              : null;
+            const sand = properties.sand?.depths?.[0]?.values?.mean
+              ? (properties.sand.depths[0].values.mean / 10).toFixed(1)
+              : null;
+            const silt = properties.silt?.depths?.[0]?.values?.mean
+              ? (properties.silt.depths[0].values.mean / 10).toFixed(1)
+              : null;
+            const organicCarbon = properties.soc?.depths?.[0]?.values?.mean
+              ? (properties.soc.depths[0].values.mean / 10).toFixed(1)
+              : null;
+            const nitrogen = properties.nitrogen?.depths?.[0]?.values?.mean
+              ? (properties.nitrogen.depths[0].values.mean / 100).toFixed(2)
+              : null;
+
+            // Determine texture from clay, sand, silt percentages
+            let texture = "Loamy";
+            if (clay && sand && silt) {
+              const clayNum = parseFloat(clay);
+              const sandNum = parseFloat(sand);
+              if (clayNum > 40) texture = "Clay";
+              else if (sandNum > 70) texture = "Sandy";
+              else if (sandNum > 50) texture = "Sandy Loam";
+              else if (clayNum > 25 && sandNum < 45) texture = "Clay Loam";
+              else texture = "Loamy";
+            }
+
+            soilDataFromAPI = {
+              ph,
+              nitrogen,
+              organicCarbon,
+              clay,
+              sand,
+              silt,
+              texture,
+              source: "SoilGrids (ISRIC World Soil Database)",
+            };
+          }
+        }
+      } catch (apiError) {
+        console.warn("⚠️ Could not fetch from SoilGrids API:", apiError);
+      }
+
+      // Estimate soil type based on location (using known patterns for India)
+      let soilType = "Unknown";
+      let soilDescription = "";
+      let estimatedPH = "6.5-7.5";
+      let organicMatter = "1-2%";
+      let texture = "Loamy";
+
+      // India soil classification based on latitude/longitude
+      // Kerala region (8-13°N, 74-77°E)
+      if (
+        latitude >= 8 &&
+        latitude <= 13 &&
+        longitude >= 74 &&
+        longitude <= 77
+      ) {
+        soilType = "Laterite Soil";
+        soilDescription =
+          "Rich in iron and aluminum, acidic in nature. Common in Kerala's coastal and midland regions.";
+        estimatedPH = "5.0-6.5";
+        organicMatter = "2-4%";
+        texture = "Clay loam with laterite content";
+      }
+      // Karnataka region (12-18°N, 74-78°E)
+      else if (
+        latitude >= 12 &&
+        latitude <= 18 &&
+        longitude >= 74 &&
+        longitude <= 78
+      ) {
+        soilType = "Red Soil / Black Soil";
+        soilDescription =
+          "Red soil in northern parts, black soil in southern regions. Good for cotton and groundnut.";
+        estimatedPH = "6.0-7.5";
+        organicMatter = "1.5-3%";
+        texture = "Clay to clay loam";
+      }
+      // Tamil Nadu region (8-13°N, 76-80°E)
+      else if (
+        latitude >= 8 &&
+        latitude <= 13 &&
+        longitude >= 76 &&
+        longitude <= 80
+      ) {
+        soilType = "Black Soil / Red Soil";
+        soilDescription =
+          "Black soil in western parts, red soil in eastern regions. Suitable for rice and cotton.";
+        estimatedPH = "6.5-8.0";
+        organicMatter = "1-2.5%";
+        texture = "Clay to sandy loam";
+      }
+      // North India - Punjab, Haryana (29-32°N, 74-77°E)
+      else if (
+        latitude >= 29 &&
+        latitude <= 32 &&
+        longitude >= 74 &&
+        longitude <= 77
+      ) {
+        soilType = "Alluvial Soil";
+        soilDescription =
+          "Fertile alluvial soil from Indo-Gangetic plains. Excellent for wheat and rice cultivation.";
+        estimatedPH = "7.0-8.5";
+        organicMatter = "0.5-1.5%";
+        texture = "Sandy loam to loamy";
+      }
+      // Maharashtra - Deccan Plateau (16-21°N, 73-80°E)
+      else if (
+        latitude >= 16 &&
+        latitude <= 21 &&
+        longitude >= 73 &&
+        longitude <= 80
+      ) {
+        soilType = "Black Soil (Regur)";
+        soilDescription =
+          "Deep black cotton soil, rich in lime and calcium. Ideal for cotton, sugarcane, and jowar.";
+        estimatedPH = "7.5-9.0";
+        organicMatter = "0.5-1.5%";
+        texture = "Heavy clay";
+      }
+      // West Bengal (21-27°N, 85-89°E)
+      else if (
+        latitude >= 21 &&
+        latitude <= 27 &&
+        longitude >= 85 &&
+        longitude <= 89
+      ) {
+        soilType = "Alluvial Soil";
+        soilDescription =
+          "Deltaic alluvial soil from Ganges-Brahmaputra delta. Rich in nutrients, ideal for rice.";
+        estimatedPH = "6.5-7.5";
+        organicMatter = "2-3%";
+        texture = "Silty clay to clay";
+      }
+      // Coastal regions
+      else if (
+        latitude >= 8 &&
+        latitude <= 20 &&
+        (longitude <= 74 || longitude >= 85)
+      ) {
+        soilType = "Coastal Alluvial / Sandy Soil";
+        soilDescription =
+          "Coastal sandy soil with salt content. Suitable for coconut and cashew.";
+        estimatedPH = "6.0-7.0";
+        organicMatter = "0.5-2%";
+        texture = "Sandy to sandy loam";
+      }
+      // Default for other regions
+      else {
+        soilType = "Mixed Soil";
+        soilDescription =
+          "Regional soil characteristics vary. Local soil testing recommended.";
+        estimatedPH = "6.0-7.5";
+        organicMatter = "1-2%";
+        texture = "Variable";
+      }
+
+      // Format soil data for the textarea
+      let fetchedSoilData = `Location: ${latitude.toFixed(4)}°N, ${longitude.toFixed(4)}°E
+
+Soil Type: ${soilType}
+Description: ${soilDescription}
+
+`;
+
+      // Add real API data if available
+      if (soilDataFromAPI) {
+        fetchedSoilData += `📊 ACTUAL SOIL DATA (from ${soilDataFromAPI.source}):
+
+Laboratory Analysis:
+- pH Level: ${soilDataFromAPI.ph || "N/A"}
+- Texture: ${soilDataFromAPI.texture || "N/A"}
+- Clay Content: ${soilDataFromAPI.clay || "N/A"}%
+- Sand Content: ${soilDataFromAPI.sand || "N/A"}%
+- Silt Content: ${soilDataFromAPI.silt || "N/A"}%
+- Organic Carbon: ${soilDataFromAPI.organicCarbon || "N/A"} g/kg
+- Nitrogen Content: ${soilDataFromAPI.nitrogen || "N/A"} cg/kg
+
+`;
+      }
+
+      fetchedSoilData += `Regional Estimates:
+- pH Level: ${estimatedPH}
+- Texture: ${texture}
+- Organic Matter: ${organicMatter}
+- Drainage: Moderate
+
+${soilDataFromAPI ? "✅ Data includes actual measurements from global soil database." : "⚠️ This is estimated data based on regional soil patterns."}
+For precise recommendations, conduct a soil test at an agricultural laboratory.
+
+(You can edit this data if you have actual test results)`;
+
+      setSoilData(fetchedSoilData);
+      setUploadMethod("manual"); // Switch to manual mode to show the data
+      setLocationFetched(true);
+
+      console.log(
+        "✅ Soil data fetched successfully",
+        soilDataFromAPI ? "with real API data" : "with regional estimates"
+      );
+    } catch (error) {
+      console.error("❌ Error fetching location:", error);
+      alert(
+        error instanceof Error
+          ? `Location Error: ${error.message}\n\nPlease enable location permissions and try again.`
+          : "Unable to fetch your location. Please enter soil data manually."
+      );
+    } finally {
+      setIsFetchingLocation(false);
     }
   };
 
   const analyzeSoil = async () => {
     if (!soilData && !selectedFile && !capturedImage) {
-      alert("Please provide soil data by entering manually, uploading a file, or taking a photo.");
+      alert(
+        "Please provide soil data by entering manually, uploading a file, or taking a photo."
+      );
       return;
     }
 
@@ -143,14 +412,17 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
 
     try {
       console.log("🌱 Starting soil analysis for:", selectedCrop);
-      console.log("📊 Soil data provided:", soilData ? "Manual entry" : `File: ${selectedFile?.name}`);
-      
+      console.log(
+        "📊 Soil data provided:",
+        soilData ? "Manual entry" : `File: ${selectedFile?.name}`
+      );
+
       // Initialize Gemini AI
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
       if (!apiKey) {
         throw new Error("AIzaSyCEqOhNbkfUrk0DhceXwOd9_0Eyr0QtiEo");
       }
-      
+
       const genAI = new GoogleGenerativeAI(apiKey);
 
       const prompt = `
@@ -193,12 +465,12 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
       `;
 
       console.log("🔄 Sending request to Gemini API...");
-      
+
       // Try different models in order of preference
       const modelsToTry = ["gemini-1.5-flash"];
       let result;
       let lastError;
-      
+
       for (const modelName of modelsToTry) {
         try {
           console.log(`🤖 Trying model: ${modelName}`);
@@ -212,20 +484,23 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
           continue;
         }
       }
-      
+
       if (!result) {
         throw lastError || new Error("All models failed");
       }
-      
+
       const response = await result.response;
       const analysisText = response.text();
-      
+
       console.log("✅ Analysis completed successfully");
       setAnalysis(analysisText);
     } catch (error) {
       console.error("❌ Error analyzing soil:", error);
-      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-      setAnalysis(`Sorry, there was an error analyzing your soil data: ${errorMessage}\n\nPlease check your internet connection and try again.`);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      setAnalysis(
+        `Sorry, there was an error analyzing your soil data: ${errorMessage}\n\nPlease check your internet connection and try again.`
+      );
     } finally {
       setIsLoading(false);
     }
@@ -239,7 +514,7 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
     setCapturedImage(null);
     setIsCameraActive(false);
     if (cameraInputRef.current) {
-      cameraInputRef.current.value = '';
+      cameraInputRef.current.value = "";
     }
   };
 
@@ -272,9 +547,32 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
         {/* Upload Method Selection */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Upload className="h-5 w-5" />
-              <span>Soil Data Input</span>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Upload className="h-5 w-5" />
+                <span>Soil Data Input</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchSoilFromLocation}
+                disabled={isFetchingLocation}
+                className="flex items-center space-x-2"
+              >
+                {isFetchingLocation ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span className="hidden sm:inline">Fetching...</span>
+                  </>
+                ) : (
+                  <>
+                    <MapPin className="h-4 w-4" />
+                    <span className="hidden sm:inline">
+                      Fetch from Location
+                    </span>
+                  </>
+                )}
+              </Button>
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -308,11 +606,24 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
             {uploadMethod === "manual" && (
               <div className="space-y-4">
                 <Label htmlFor="soil-data">Enter Soil Test Results</Label>
+                {locationFetched && (
+                  <div className="flex items-center space-x-2 text-sm text-green-600 bg-green-50 dark:bg-green-900/20 p-2 rounded-md">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>
+                      {soilData.includes("ACTUAL SOIL DATA")
+                        ? "✅ Real soil data fetched from global database! You can edit if needed."
+                        : "📍 Regional soil data fetched. You can edit it below if needed."}
+                    </span>
+                  </div>
+                )}
                 <Textarea
                   id="soil-data"
                   placeholder="Enter your soil test results here (pH, N-P-K levels, organic matter %, soil type, etc.)"
                   value={soilData}
-                  onChange={(e) => setSoilData(e.target.value)}
+                  onChange={(e) => {
+                    setSoilData(e.target.value);
+                    setLocationFetched(false); // Clear indicator when user edits
+                  }}
                   className="min-h-[120px]"
                 />
               </div>
@@ -340,7 +651,7 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
             {uploadMethod === "camera" && (
               <div className="space-y-4">
                 <Label>Take Photo of Soil Report</Label>
-                
+
                 {/* Hidden camera input */}
                 <input
                   ref={cameraInputRef}
@@ -350,11 +661,13 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
                   onChange={handleCameraCapture}
                   className="hidden"
                 />
-                
+
                 {!capturedImage ? (
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
                     <Camera className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                    <p className="text-gray-600 mb-4">Capture your soil test report</p>
+                    <p className="text-gray-600 mb-4">
+                      Capture your soil test report
+                    </p>
                     <Button
                       type="button"
                       onClick={openCamera}
@@ -406,14 +719,20 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              <Label htmlFor="crop-select">What crop are you planning to grow?</Label>
+              <Label htmlFor="crop-select">
+                What crop are you planning to grow?
+              </Label>
               <Select value={selectedCrop} onValueChange={setSelectedCrop}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Select a crop" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[200px] overflow-y-auto z-50">
                   {cropOptions.map((crop) => (
-                    <SelectItem key={crop.value} value={crop.value} className="cursor-pointer">
+                    <SelectItem
+                      key={crop.value}
+                      value={crop.value}
+                      className="cursor-pointer"
+                    >
                       {crop.label}
                     </SelectItem>
                   ))}
@@ -426,7 +745,11 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
         {/* Analyze Button */}
         <Button
           onClick={analyzeSoil}
-          disabled={isLoading || (!soilData && !selectedFile && !capturedImage) || !selectedCrop}
+          disabled={
+            isLoading ||
+            (!soilData && !selectedFile && !capturedImage) ||
+            !selectedCrop
+          }
           className="w-full bg-emerald-600 hover:bg-emerald-700"
         >
           {isLoading ? (
@@ -459,68 +782,89 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
             <CardContent>
               <div className="max-h-[50vh] overflow-y-auto pb-4">
                 <div className="space-y-4">
-                  {analysis.split('\n\n').map((section, index) => {
-                  const lines = section.trim().split('\n');
-                  if (lines.length === 0 || !lines[0]) return null;
-                  
-                  const heading = lines[0].trim();
-                  const content = lines.slice(1);
-                  
-                  // Determine section color based on heading
-                  let sectionColor = "bg-gray-50 dark:bg-gray-800";
-                  let borderColor = "border-gray-200 dark:border-gray-600";
-                  let iconColor = "text-gray-600";
-                  
-                  if (heading.includes('SOIL HEALTH')) {
-                    sectionColor = "bg-green-50 dark:bg-green-900/20";
-                    borderColor = "border-green-200 dark:border-green-700";
-                    iconColor = "text-green-600";
-                  } else if (heading.includes('NUTRIENTS')) {
-                    sectionColor = "bg-blue-50 dark:bg-blue-900/20";
-                    borderColor = "border-blue-200 dark:border-blue-700";
-                    iconColor = "text-blue-600";
-                  } else if (heading.includes('FERTILIZER')) {
-                    sectionColor = "bg-purple-50 dark:bg-purple-900/20";
-                    borderColor = "border-purple-200 dark:border-purple-700";
-                    iconColor = "text-purple-600";
-                  } else if (heading.includes('IMPROVEMENTS')) {
-                    sectionColor = "bg-orange-50 dark:bg-orange-900/20";
-                    borderColor = "border-orange-200 dark:border-orange-700";
-                    iconColor = "text-orange-600";
-                  } else if (heading.includes('CROP MANAGEMENT')) {
-                    sectionColor = "bg-emerald-50 dark:bg-emerald-900/20";
-                    borderColor = "border-emerald-200 dark:border-emerald-700";
-                    iconColor = "text-emerald-600";
-                  } else if (heading.includes('WATCH FOR')) {
-                    sectionColor = "bg-red-50 dark:bg-red-900/20";
-                    borderColor = "border-red-200 dark:border-red-700";
-                    iconColor = "text-red-600";
-                  }
-                  
-                  return (
-                    <div key={index} className={`${sectionColor} ${borderColor} border rounded-lg p-4`}>
-                      <h3 className={`font-semibold text-sm mb-3 ${iconColor} flex items-center`}>
-                        {heading.includes('SOIL HEALTH') && <TestTube className="h-4 w-4 mr-2" />}
-                        {heading.includes('NUTRIENTS') && <Sprout className="h-4 w-4 mr-2" />}
-                        {heading.includes('FERTILIZER') && <FileText className="h-4 w-4 mr-2" />}
-                        {heading.includes('IMPROVEMENTS') && <Upload className="h-4 w-4 mr-2" />}
-                        {heading.includes('CROP MANAGEMENT') && <CheckCircle className="h-4 w-4 mr-2" />}
-                        {heading.includes('WATCH FOR') && <AlertCircle className="h-4 w-4 mr-2" />}
-                        {heading}
-                      </h3>
-                      <div className="space-y-1">
-                        {content.map((line, lineIndex) => {
-                          if (!line.trim()) return null;
-                          return (
-                            <div key={lineIndex} className="text-sm text-gray-700 dark:text-gray-300">
-                              {line.trim()}
-                            </div>
-                          );
-                        })}
+                  {analysis.split("\n\n").map((section, index) => {
+                    const lines = section.trim().split("\n");
+                    if (lines.length === 0 || !lines[0]) return null;
+
+                    const heading = lines[0].trim();
+                    const content = lines.slice(1);
+
+                    // Determine section color based on heading
+                    let sectionColor = "bg-gray-50 dark:bg-gray-800";
+                    let borderColor = "border-gray-200 dark:border-gray-600";
+                    let iconColor = "text-gray-600";
+
+                    if (heading.includes("SOIL HEALTH")) {
+                      sectionColor = "bg-green-50 dark:bg-green-900/20";
+                      borderColor = "border-green-200 dark:border-green-700";
+                      iconColor = "text-green-600";
+                    } else if (heading.includes("NUTRIENTS")) {
+                      sectionColor = "bg-blue-50 dark:bg-blue-900/20";
+                      borderColor = "border-blue-200 dark:border-blue-700";
+                      iconColor = "text-blue-600";
+                    } else if (heading.includes("FERTILIZER")) {
+                      sectionColor = "bg-purple-50 dark:bg-purple-900/20";
+                      borderColor = "border-purple-200 dark:border-purple-700";
+                      iconColor = "text-purple-600";
+                    } else if (heading.includes("IMPROVEMENTS")) {
+                      sectionColor = "bg-orange-50 dark:bg-orange-900/20";
+                      borderColor = "border-orange-200 dark:border-orange-700";
+                      iconColor = "text-orange-600";
+                    } else if (heading.includes("CROP MANAGEMENT")) {
+                      sectionColor = "bg-emerald-50 dark:bg-emerald-900/20";
+                      borderColor =
+                        "border-emerald-200 dark:border-emerald-700";
+                      iconColor = "text-emerald-600";
+                    } else if (heading.includes("WATCH FOR")) {
+                      sectionColor = "bg-red-50 dark:bg-red-900/20";
+                      borderColor = "border-red-200 dark:border-red-700";
+                      iconColor = "text-red-600";
+                    }
+
+                    return (
+                      <div
+                        key={index}
+                        className={`${sectionColor} ${borderColor} border rounded-lg p-4`}
+                      >
+                        <h3
+                          className={`font-semibold text-sm mb-3 ${iconColor} flex items-center`}
+                        >
+                          {heading.includes("SOIL HEALTH") && (
+                            <TestTube className="h-4 w-4 mr-2" />
+                          )}
+                          {heading.includes("NUTRIENTS") && (
+                            <Sprout className="h-4 w-4 mr-2" />
+                          )}
+                          {heading.includes("FERTILIZER") && (
+                            <FileText className="h-4 w-4 mr-2" />
+                          )}
+                          {heading.includes("IMPROVEMENTS") && (
+                            <Upload className="h-4 w-4 mr-2" />
+                          )}
+                          {heading.includes("CROP MANAGEMENT") && (
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                          )}
+                          {heading.includes("WATCH FOR") && (
+                            <AlertCircle className="h-4 w-4 mr-2" />
+                          )}
+                          {heading}
+                        </h3>
+                        <div className="space-y-1">
+                          {content.map((line, lineIndex) => {
+                            if (!line.trim()) return null;
+                            return (
+                              <div
+                                key={lineIndex}
+                                className="text-sm text-gray-700 dark:text-gray-300"
+                              >
+                                {line.trim()}
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
                 </div>
               </div>
             </CardContent>
@@ -538,6 +882,10 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
             </CardHeader>
             <CardContent>
               <ul className="space-y-2 text-sm">
+                <li>
+                  • 🌍 Use "Fetch from Location" to get real soil data from
+                  global databases (SoilGrids/ISRIC)
+                </li>
                 <li>• Include pH levels in your soil data</li>
                 <li>• Mention N-P-K (Nitrogen-Phosphorus-Potassium) values</li>
                 <li>• Add organic matter percentage if available</li>
