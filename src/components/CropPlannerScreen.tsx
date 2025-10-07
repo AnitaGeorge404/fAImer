@@ -730,8 +730,28 @@ const CropPlannerScreen: React.FC<CropPlannerScreenProps> = ({ onBack }) => {
 
     // Generate todo list for the selected crop
     try {
-      const todoList = generateCropTodoList(plan.crop, plan.area);
-      setCropTodoList(todoList || []);
+      const todoList = generateCropTodoList(plan.crop, plan.area) || [];
+
+      // Merge user-added tasks saved under planUserTodos (if any)
+      try {
+        const raw = localStorage.getItem("planUserTodos");
+        const map = raw ? JSON.parse(raw) : {};
+        const userTasks = map[plan.id] || [];
+
+        // Insert user tasks as Day 0 items at the top
+        const userDay = userTasks.length
+          ? [
+              {
+                day: 0,
+                tasks: userTasks.map((t: any) => t.text),
+              },
+            ]
+          : [];
+
+        setCropTodoList([...userDay, ...todoList]);
+      } catch (e) {
+        setCropTodoList(todoList);
+      }
     } catch (error) {
       console.error("Error generating todo list:", error);
       setTodoLoadingMessage("Error loading tasks, please try again");

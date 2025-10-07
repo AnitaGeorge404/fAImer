@@ -19,6 +19,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import SuggestionPopup from "./SuggestionPopup";
+import TodoModal from "./TodoModal";
+import Notifications from "./Notifications";
 
 interface DiagnosisResult {
   disease: string;
@@ -55,6 +58,9 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [diagnosisResult, setDiagnosisResult] =
     useState<DiagnosisResult | null>(null);
+  const [showSuggestion, setShowSuggestion] = useState(false);
+  const [suggestionText, setSuggestionText] = useState("");
+  const [todoModalOpen, setTodoModalOpen] = useState(false);
   const [isDiagnosing, setIsDiagnosing] = useState(false);
   const [location, setLocation] = useState<LocationData | null>(null);
   const [locationError, setLocationError] = useState<string>("");
@@ -194,7 +200,7 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
       const base64Image = convertImageToBase64(selectedImage);
       const locationInfo = location
@@ -282,6 +288,18 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
         }
 
         setDiagnosisResult(diseaseData);
+
+        // Show single suggestion if meaningful detection
+        const name = (diseaseData.disease || "").toLowerCase();
+        if (
+          name &&
+          !["healthy plant", "analysis error"].includes(name) &&
+          !name.includes("no")
+        ) {
+          const suggestion = `Treat ${diseaseData.affectedCrop || diseaseData.disease} - ${(diseaseData.treatment || "Follow recommended treatment").split(".")[0]}`;
+          setSuggestionText(suggestion);
+          setShowSuggestion(true);
+        }
 
         toast({
           title: "Diagnosis Complete",
@@ -825,6 +843,27 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
           </>
         )}
       </div>
+      {showSuggestion && (
+        <SuggestionPopup
+          suggestion={suggestionText}
+          onAdd={() => setTodoModalOpen(true)}
+          onClose={() => setShowSuggestion(false)}
+        />
+      )}
+
+      <TodoModal
+        open={todoModalOpen}
+        suggestion={suggestionText}
+        onClose={() => {
+          setTodoModalOpen(false);
+          setShowSuggestion(false);
+        }}
+        onAdded={() => {
+          setTodoModalOpen(false);
+        }}
+      />
+
+      <Notifications />
     </div>
   );
 };

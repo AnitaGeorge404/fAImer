@@ -15,6 +15,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import SuggestionPopup from "./SuggestionPopup";
+import TodoModal from "./TodoModal";
+import Notifications from "./Notifications";
 
 interface WeedResult {
   name: string;
@@ -46,6 +49,9 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isIdentifying, setIsIdentifying] = useState(false);
   const [result, setResult] = useState<WeedResult | null>(null);
+  const [showSuggestion, setShowSuggestion] = useState(false);
+  const [suggestionText, setSuggestionText] = useState("");
+  const [todoModalOpen, setTodoModalOpen] = useState(false);
   const [location, setLocation] = useState<LocationData | null>(null);
   const [locationError, setLocationError] = useState<string>("");
 
@@ -244,6 +250,14 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
         }
 
         setResult(weedData);
+
+        // Show suggestion for meaningful detection
+        const name = (weedData.name || "").toLowerCase();
+        if (name && !["no weed detected", "analysis error"].includes(name) && !name.includes("no")) {
+          const suggestion = `Remove ${weedData.name} - ${weedData.treatment?.split(".")[0] || "Manual removal recommended"}`;
+          setSuggestionText(suggestion);
+          setShowSuggestion(true);
+        }
       } else {
         throw new Error("Invalid response format from AI");
       }
@@ -601,6 +615,25 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
       </div>
 
       <canvas ref={canvasRef} className="hidden" />
+      {showSuggestion && (
+        <SuggestionPopup
+          suggestion={suggestionText}
+          onAdd={() => setTodoModalOpen(true)}
+          onClose={() => setShowSuggestion(false)}
+        />
+      )}
+
+      <TodoModal
+        open={todoModalOpen}
+        suggestion={suggestionText}
+        onClose={() => {
+          setTodoModalOpen(false);
+          setShowSuggestion(false);
+        }}
+        onAdded={() => setTodoModalOpen(false)}
+      />
+
+      <Notifications />
     </div>
   );
 };

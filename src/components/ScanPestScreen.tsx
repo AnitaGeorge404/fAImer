@@ -19,6 +19,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import SuggestionPopup from "./SuggestionPopup";
+import TodoModal from "./TodoModal";
+import Notifications from "./Notifications";
 
 interface ScanPestScreenProps {
   onBack?: () => void;
@@ -54,6 +57,9 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({
 }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [scanResult, setScanResult] = useState<PestResult | null>(null);
+  const [showSuggestion, setShowSuggestion] = useState(false);
+  const [suggestionText, setSuggestionText] = useState("");
+  const [todoModalOpen, setTodoModalOpen] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [location, setLocation] = useState<LocationData | null>(null);
   const [locationError, setLocationError] = useState<string>("");
@@ -269,6 +275,14 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({
         }
 
         setScanResult(pestData);
+
+        // Show suggestion for meaningful detection
+        const name = (pestData.name || "").toLowerCase();
+        if (name && !["no pest detected", "analysis error"].includes(name) && !name.includes("no")) {
+          const suggestion = `Treat ${pestData.name} - ${pestData.treatment?.split(".")[0] || "Recommended treatment"}`;
+          setSuggestionText(suggestion);
+          setShowSuggestion(true);
+        }
       } else {
         throw new Error("Invalid response format from AI");
       }
@@ -761,6 +775,25 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({
           </>
         )}
       </div>
+      {showSuggestion && (
+        <SuggestionPopup
+          suggestion={suggestionText}
+          onAdd={() => setTodoModalOpen(true)}
+          onClose={() => setShowSuggestion(false)}
+        />
+      )}
+
+      <TodoModal
+        open={todoModalOpen}
+        suggestion={suggestionText}
+        onClose={() => {
+          setTodoModalOpen(false);
+          setShowSuggestion(false);
+        }}
+        onAdded={() => setTodoModalOpen(false)}
+      />
+
+      <Notifications />
     </div>
   );
 };
