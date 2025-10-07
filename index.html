@@ -1,13 +1,142 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap"
+      rel="stylesheet"
+    />
+
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>faimer-vite</title>
+    <title>fAImer - Your Personal Farming Assistant</title>
+    <meta
+      name="description"
+      content="fAImer - A comprehensive farming assistant app for Indian farmers with voice-first, multilingual support and rural-friendly UX"
+    />
+    <meta name="author" content="fAImer Team" />
+
+    <meta
+      property="og:title"
+      content="fAImer - Your Personal Farming Assistant"
+    />
+    <meta
+      property="og:description"
+      content="Comprehensive farming assistant app designed for Indian farmers with voice-first capabilities and multilingual support"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://lovable.dev/opengraph-image-p98pqg.png"
+    />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@lovable_dev" />
+    <meta
+      name="twitter:image"
+      content="https://lovable.dev/opengraph-image-p98pqg.png"
+    />
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#16a34a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="fAImer" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- PWA Icons -->
+    <link
+      rel="icon"
+      href="/lovable-uploads/852b0cb2-1c40-4d2d-9582-b65109704e1a.png"
+      type="image/png"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="/lovable-uploads/852b0cb2-1c40-4d2d-9582-b65109704e1a.png"
+    />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Google Fonts for better typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
   </head>
+
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker.register("/sw.js").then(
+            function (registration) {
+              console.log("SW registered: ", registration);
+
+              // Check for service worker updates
+              registration.addEventListener("updatefound", () => {
+                const newWorker = registration.installing;
+                console.log("New service worker found, installing...");
+
+                newWorker.addEventListener("statechange", () => {
+                  if (newWorker.state === "installed") {
+                    if (navigator.serviceWorker.controller) {
+                      // New content is available
+                      console.log("New content available");
+
+                      // Show update notification (optional)
+                      if (
+                        window.confirm(
+                          "New version available! Reload to update?"
+                        )
+                      ) {
+                        window.location.reload();
+                      }
+                    } else {
+                      // Content is cached for the first time
+                      console.log("Content is cached for offline use");
+
+                      // Show offline ready notification
+                      const notification = document.createElement("div");
+                      notification.style.cssText = `
+                        position: fixed; top: 10px; right: 10px; z-index: 9999;
+                        background: #16a34a; color: white; padding: 10px 20px;
+                        border-radius: 5px; font-family: Arial, sans-serif;
+                        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                      `;
+                      notification.textContent = "App ready for offline use!";
+                      document.body.appendChild(notification);
+
+                      setTimeout(() => notification.remove(), 5000);
+                    }
+                  }
+                });
+              });
+
+              // Listen for controlling event
+              navigator.serviceWorker.addEventListener(
+                "controllerchange",
+                () => {
+                  console.log("New service worker is now controlling the page");
+                }
+              );
+            },
+            function (registrationError) {
+              console.log("SW registration failed: ", registrationError);
+            }
+          );
+        });
+
+        // Listen for service worker messages
+        navigator.serviceWorker.addEventListener("message", (event) => {
+          console.log("Received message from service worker:", event.data);
+        });
+      } else {
+        console.log("Service workers are not supported in this browser");
+      }
+    </script>
   </body>
 </html>
