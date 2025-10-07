@@ -20,6 +20,11 @@ import {
   Clock,
   Target,
   BookOpen,
+  ChevronRight,
+  ChevronLeft,
+  Users,
+  DollarSign,
+  Layers,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,6 +39,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useTranslation } from "@/contexts/TranslationContext";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface CropRecommendation {
   id: string;
@@ -68,6 +74,18 @@ interface LocationData {
   soilType: string;
 }
 
+interface FarmerInput {
+  farmSize: string;
+  farmSizeUnit: string;
+  laborAvailability: string;
+  waterAvailability: string;
+  irrigationType: string;
+  budget: string;
+  budgetUnit: string;
+  soilType: string;
+  experience: string;
+}
+
 interface CropWiseProps {
   onBack?: () => void;
 }
@@ -81,11 +99,28 @@ const CropWise: React.FC<CropWiseProps> = ({ onBack }) => {
     []
   );
   const [location, setLocation] = useState<LocationData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedCrop, setSelectedCrop] = useState<CropRecommendation | null>(
     null
   );
+  const [showOnboarding, setShowOnboarding] = useState(true);
+  const [onboardingStep, setOnboardingStep] = useState(0);
+  const [farmerInput, setFarmerInput] = useState<FarmerInput>({
+    farmSize: "",
+    farmSizeUnit: "acres",
+    laborAvailability: "",
+    waterAvailability: "",
+    irrigationType: "",
+    budget: "",
+    budgetUnit: "INR",
+    soilType: "",
+    experience: "",
+  });
+  const [isGeneratingRecommendations, setIsGeneratingRecommendations] =
+    useState(false);
   const { toast } = useToast();
+
+  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
   const getTranslatedText = (englishText: string) => {
     if (currentLanguage !== "ml") return englishText;
@@ -314,7 +349,6 @@ const CropWise: React.FC<CropWiseProps> = ({ onBack }) => {
 
   useEffect(() => {
     getCurrentLocation();
-    loadRecommendations();
   }, []);
 
   const getCurrentLocation = () => {
@@ -372,11 +406,144 @@ const CropWise: React.FC<CropWiseProps> = ({ onBack }) => {
     }
   };
 
-  const loadRecommendations = () => {
-    setTimeout(() => {
+  const generateAIRecommendations = async () => {
+    if (!apiKey) {
+      toast({
+        title: "API Key Missing",
+        description: "Please configure your Gemini API key",
+        variant: "destructive",
+      });
       setRecommendations(sampleRecommendations);
-      setIsLoading(false);
-    }, 1500);
+      return;
+    }
+
+    setIsGeneratingRecommendations(true);
+
+    try {
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+      const prompt = `
+        You are an expert agricultural advisor. Based on the following farmer information, provide detailed crop recommendations.
+
+        Farmer Details:
+        - Farm Size: ${farmerInput.farmSize} ${farmerInput.farmSizeUnit}
+        - Labor Availability: ${farmerInput.laborAvailability}
+        - Water Availability: ${farmerInput.waterAvailability}
+        - Irrigation Type: ${farmerInput.irrigationType}
+        - Budget: ${farmerInput.budget} ${farmerInput.budgetUnit}
+        - Soil Type: ${farmerInput.soilType}
+        - Farming Experience: ${farmerInput.experience}
+        - Location: ${location?.city}, ${location?.region}
+        - Climate: ${location?.climate}
+
+        Provide 6 crop recommendations in the following JSON format. Each recommendation should be tailored to the farmer's specific situation:
+        [
+          {
+            "name": "Crop name",
+            "scientificName": "Scientific name",
+            "category": "Grains/Vegetables/Cash Crops/Fruits",
+            "suitability": "High/Medium/Low",
+            "reasoning": "Detailed explanation of why this crop is recommended based on the farmer's specific situation (2-3 sentences)",
+            "growthDuration": "XX-XX days",
+            "yield": "X-X tons/hectare",
+            "waterRequirement": "Low/Medium/High",
+            "sunlightRequirement": "Full Sun/Partial Sun/Shade",
+            "soilType": ["soil type 1", "soil type 2"],
+            "bestSeason": "Kharif/Rabi/All Season",
+            "marketPrice": "₹XX-XX/kg or per unit",
+            "profitability": 1-5,
+            "difficulty": "Easy/Moderate/Hard",
+            "advantages": ["advantage 1", "advantage 2", "advantage 3"],
+            "considerations": ["consideration 1", "consideration 2"],
+            "spacing": "spacing details",
+            "fertilizer": "fertilizer recommendations",
+            "pests": ["pest 1", "pest 2"],
+            "diseases": ["disease 1", "disease 2"],
+            "estimatedInvestment": "₹XXXX per ${farmerInput.farmSizeUnit}",
+            "estimatedProfit": "₹XXXX per ${farmerInput.farmSizeUnit}"
+          }
+        ]
+
+        Important:
+        - Prioritize crops that match the farmer's budget, farm size, and labor availability
+        - Consider the irrigation type and water availability
+        - Match crops to the soil type and climate
+        - For beginners, prioritize easier crops with lower risk
+        - Provide realistic market prices in Indian Rupees
+        - Include detailed reasoning for each recommendation
+        - Return ONLY valid JSON array, no markdown or extra text
+      `;
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+
+      // Extract JSON from response
+      const jsonMatch = text.match(/\[[\s\S]*\]/);
+      if (jsonMatch) {
+        const aiRecommendations = JSON.parse(jsonMatch[0]);
+
+        // Add IDs and imageUrl to recommendations
+        const processedRecommendations = aiRecommendations.map(
+          (crop: any, index: number) => ({
+            ...crop,
+            id: `ai-crop-${index}`,
+            imageUrl: "/assets/quick-crop-wise.png",
+          })
+        );
+
+        setRecommendations(processedRecommendations);
+
+        toast({
+          title: "Recommendations Generated",
+          description: `Found ${processedRecommendations.length} crops perfect for your farm!`,
+        });
+      } else {
+        throw new Error("Invalid response format from AI");
+      }
+    } catch (error) {
+      console.error("Error generating recommendations:", error);
+      toast({
+        title: "Error",
+        description:
+          "Failed to generate AI recommendations. Showing default recommendations.",
+        variant: "destructive",
+      });
+      setRecommendations(sampleRecommendations);
+    } finally {
+      setIsGeneratingRecommendations(false);
+      setShowOnboarding(false);
+    }
+  };
+
+  const handleNextStep = () => {
+    if (onboardingStep < 3) {
+      setOnboardingStep(onboardingStep + 1);
+    } else {
+      generateAIRecommendations();
+    }
+  };
+
+  const handlePreviousStep = () => {
+    if (onboardingStep > 0) {
+      setOnboardingStep(onboardingStep - 1);
+    }
+  };
+
+  const isStepValid = () => {
+    switch (onboardingStep) {
+      case 0:
+        return farmerInput.farmSize && farmerInput.soilType;
+      case 1:
+        return farmerInput.laborAvailability && farmerInput.experience;
+      case 2:
+        return farmerInput.waterAvailability && farmerInput.irrigationType;
+      case 3:
+        return farmerInput.budget;
+      default:
+        return false;
+    }
   };
 
   const filteredRecommendations = recommendations.filter((crop) => {
@@ -442,36 +609,364 @@ const CropWise: React.FC<CropWiseProps> = ({ onBack }) => {
     ));
   };
 
-  if (isLoading) {
+  // Onboarding Screen
+  if (showOnboarding) {
     return (
       <div className="pb-20 bg-background min-h-screen">
         <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
           <div className="flex items-center gap-4 p-4">
-            
-            <div>
+            {onboardingStep > 0 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handlePreviousStep}
+                className="text-foreground"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+            )}
+            <div className="flex-1">
               <h1 className="text-xl font-bold text-foreground">
-                {getTranslatedText("CropWise Recommendations")}
+                Farm Information
               </h1>
               <p className="text-sm text-muted-foreground">
-                {getTranslatedText(
-                  "Smart crop recommendations for your region"
-                )}
+                Step {onboardingStep + 1} of 4
               </p>
             </div>
           </div>
+
+          {/* Progress Bar */}
+          <div className="h-1 bg-muted">
+            <div
+              className="h-full bg-primary transition-all duration-300"
+              style={{ width: `${((onboardingStep + 1) / 4) * 100}%` }}
+            />
+          </div>
         </div>
 
-        <div className="p-4 space-y-6">
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
-              <Wheat className="h-16 w-16 mx-auto text-primary animate-pulse mb-4" />
-              <p className="text-foreground font-medium">
-                {getTranslatedText("Loading recommendations...")}
-              </p>
-              <p className="text-muted-foreground text-sm mt-2">
-                {getTranslatedText("Getting your location...")}
-              </p>
+        <div className="p-4 space-y-6 max-w-2xl mx-auto">
+          {/* Step 0: Farm Size & Soil */}
+          {onboardingStep === 0 && (
+            <div className="space-y-4 animate-in fade-in duration-300">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Layers className="h-5 w-5 text-primary" />
+                    Farm Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Farm Size *
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        placeholder="Enter size"
+                        className="flex-1 p-3 border border-border rounded-lg bg-background text-foreground"
+                        value={farmerInput.farmSize}
+                        onChange={(e) =>
+                          setFarmerInput({
+                            ...farmerInput,
+                            farmSize: e.target.value,
+                          })
+                        }
+                      />
+                      <select
+                        className="p-3 border border-border rounded-lg bg-background text-foreground"
+                        value={farmerInput.farmSizeUnit}
+                        onChange={(e) =>
+                          setFarmerInput({
+                            ...farmerInput,
+                            farmSizeUnit: e.target.value,
+                          })
+                        }
+                      >
+                        <option value="acres">Acres</option>
+                        <option value="hectares">Hectares</option>
+                        <option value="bigha">Bigha</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Soil Type *
+                    </label>
+                    <select
+                      className="w-full p-3 border border-border rounded-lg bg-background text-foreground"
+                      value={farmerInput.soilType}
+                      onChange={(e) =>
+                        setFarmerInput({
+                          ...farmerInput,
+                          soilType: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Select soil type</option>
+                      <option value="Clay">Clay</option>
+                      <option value="Loamy">Loamy</option>
+                      <option value="Sandy">Sandy</option>
+                      <option value="Sandy Loam">Sandy Loam</option>
+                      <option value="Clay Loam">Clay Loam</option>
+                      <option value="Black Cotton Soil">
+                        Black Cotton Soil
+                      </option>
+                      <option value="Red Soil">Red Soil</option>
+                      <option value="Alluvial">Alluvial</option>
+                    </select>
+                  </div>
+
+                  {location && (
+                    <div className="p-3 bg-muted rounded-lg">
+                      <div className="flex items-center gap-2 text-sm">
+                        <MapPin className="h-4 w-4 text-primary" />
+                        <span>
+                          {location.city} • {location.climate} Climate
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
+          )}
+
+          {/* Step 1: Labor & Experience */}
+          {onboardingStep === 1 && (
+            <div className="space-y-4 animate-in fade-in duration-300">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-primary" />
+                    Labor & Experience
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Labor Availability *
+                    </label>
+                    <select
+                      className="w-full p-3 border border-border rounded-lg bg-background text-foreground"
+                      value={farmerInput.laborAvailability}
+                      onChange={(e) =>
+                        setFarmerInput({
+                          ...farmerInput,
+                          laborAvailability: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Select availability</option>
+                      <option value="Abundant (5+ workers)">
+                        Abundant (5+ workers)
+                      </option>
+                      <option value="Moderate (2-4 workers)">
+                        Moderate (2-4 workers)
+                      </option>
+                      <option value="Limited (1 worker)">
+                        Limited (1 worker)
+                      </option>
+                      <option value="Self only">Self only</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Farming Experience *
+                    </label>
+                    <select
+                      className="w-full p-3 border border-border rounded-lg bg-background text-foreground"
+                      value={farmerInput.experience}
+                      onChange={(e) =>
+                        setFarmerInput({
+                          ...farmerInput,
+                          experience: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Select experience level</option>
+                      <option value="Beginner (0-2 years)">
+                        Beginner (0-2 years)
+                      </option>
+                      <option value="Intermediate (3-5 years)">
+                        Intermediate (3-5 years)
+                      </option>
+                      <option value="Experienced (6-10 years)">
+                        Experienced (6-10 years)
+                      </option>
+                      <option value="Expert (10+ years)">
+                        Expert (10+ years)
+                      </option>
+                    </select>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Step 2: Water & Irrigation */}
+          {onboardingStep === 2 && (
+            <div className="space-y-4 animate-in fade-in duration-300">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Droplets className="h-5 w-5 text-primary" />
+                    Water & Irrigation
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Water Availability *
+                    </label>
+                    <select
+                      className="w-full p-3 border border-border rounded-lg bg-background text-foreground"
+                      value={farmerInput.waterAvailability}
+                      onChange={(e) =>
+                        setFarmerInput({
+                          ...farmerInput,
+                          waterAvailability: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Select water availability</option>
+                      <option value="Abundant (River/Canal)">
+                        Abundant (River/Canal)
+                      </option>
+                      <option value="Good (Well/Borewell)">
+                        Good (Well/Borewell)
+                      </option>
+                      <option value="Moderate (Seasonal)">
+                        Moderate (Seasonal)
+                      </option>
+                      <option value="Limited (Rainfed)">
+                        Limited (Rainfed)
+                      </option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Irrigation Type *
+                    </label>
+                    <select
+                      className="w-full p-3 border border-border rounded-lg bg-background text-foreground"
+                      value={farmerInput.irrigationType}
+                      onChange={(e) =>
+                        setFarmerInput({
+                          ...farmerInput,
+                          irrigationType: e.target.value,
+                        })
+                      }
+                    >
+                      <option value="">Select irrigation type</option>
+                      <option value="Drip Irrigation">Drip Irrigation</option>
+                      <option value="Sprinkler">Sprinkler</option>
+                      <option value="Flood/Furrow">Flood/Furrow</option>
+                      <option value="Rainfed">Rainfed</option>
+                      <option value="Mixed">Mixed</option>
+                    </select>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Step 3: Budget */}
+          {onboardingStep === 3 && (
+            <div className="space-y-4 animate-in fade-in duration-300">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="h-5 w-5 text-primary" />
+                    Investment Budget
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Available Budget (per season) *
+                    </label>
+                    <div className="flex gap-2">
+                      <span className="flex items-center px-3 border border-border rounded-lg bg-muted text-foreground">
+                        ₹
+                      </span>
+                      <input
+                        type="number"
+                        placeholder="Enter amount"
+                        className="flex-1 p-3 border border-border rounded-lg bg-background text-foreground"
+                        value={farmerInput.budget}
+                        onChange={(e) =>
+                          setFarmerInput({
+                            ...farmerInput,
+                            budget: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Include costs for seeds, fertilizers, labor, and other
+                      inputs
+                    </p>
+                  </div>
+
+                  <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <h4 className="font-medium text-sm mb-2">Summary</h4>
+                    <div className="space-y-1 text-sm text-muted-foreground">
+                      <p>
+                        • Farm: {farmerInput.farmSize}{" "}
+                        {farmerInput.farmSizeUnit}
+                      </p>
+                      <p>• Soil: {farmerInput.soilType}</p>
+                      <p>• Labor: {farmerInput.laborAvailability}</p>
+                      <p>• Water: {farmerInput.waterAvailability}</p>
+                      <p>• Irrigation: {farmerInput.irrigationType}</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          <Button
+            className="w-full"
+            size="lg"
+            onClick={handleNextStep}
+            disabled={!isStepValid() || isGeneratingRecommendations}
+          >
+            {isGeneratingRecommendations ? (
+              <>
+                <Wheat className="h-5 w-5 mr-2 animate-spin" />
+                Generating Recommendations...
+              </>
+            ) : onboardingStep === 3 ? (
+              <>
+                Get Recommendations
+                <CheckCircle className="h-5 w-5 ml-2" />
+              </>
+            ) : (
+              <>
+                Continue
+                <ChevronRight className="h-5 w-5 ml-2" />
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="pb-20 bg-background min-h-screen">
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <Wheat className="h-16 w-16 mx-auto text-primary animate-pulse mb-4" />
+            <p className="text-foreground font-medium">
+              Generating your personalized recommendations...
+            </p>
           </div>
         </div>
       </div>
@@ -573,6 +1068,18 @@ const CropWise: React.FC<CropWiseProps> = ({ onBack }) => {
                     <Badge variant="outline" className="mb-3">
                       {crop.category}
                     </Badge>
+
+                    {/* AI Reasoning */}
+                    {(crop as any).reasoning && (
+                      <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <p className="text-sm text-foreground leading-relaxed">
+                          <strong className="text-primary">
+                            Why this crop:{" "}
+                          </strong>
+                          {(crop as any).reasoning}
+                        </p>
+                      </div>
+                    )}
                   </div>
                   <Wheat className="h-8 w-8 text-primary" />
                 </div>
@@ -649,6 +1156,11 @@ const CropWise: React.FC<CropWiseProps> = ({ onBack }) => {
                     <p className="text-xs text-muted-foreground">
                       Best Season: {crop.bestSeason}
                     </p>
+                    {(crop as any).estimatedProfit && (
+                      <p className="text-xs text-green-600 dark:text-green-400 font-medium mt-1">
+                        Est. Profit: {(crop as any).estimatedProfit}
+                      </p>
+                    )}
                   </div>
 
                   <Dialog>
