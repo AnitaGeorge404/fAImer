@@ -1,0 +1,19 @@
+{
+  "welcome": "Welcome to Project Kisan",
+  "phone_login": "Phone Login",
+  "enter_phone": "Enter your phone number",
+  "send_otp": "Send OTP",
+  "verify_login": "Verify & Login",
+  "voice_recognition": "Voice Recognition",
+  "fingerprint_login": "Fingerprint Login",
+  "back_to_phone": "Back to Phone Number",
+  "enter_otp": "Enter the 6-digit OTP",
+  "having_trouble": "Having trouble? Try SMS login instead.",
+  "home": "Home",
+  "notifications": "Notifications",
+  "profile": "Profile",
+  "chatbot": "Assistant",
+  "twin": "Farm Twin",
+  "resources": "Resources",
+  "updates": "Updates"
+}

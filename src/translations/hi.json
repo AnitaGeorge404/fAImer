@@ -1,0 +1,19 @@
+{
+  "welcome": "प्रोजेक्ट किसान में आपका स्वागत है",
+  "phone_login": "फोन लॉगिन",
+  "enter_phone": "अपना फोन नंबर दर्ज करें",
+  "send_otp": "ओटीपी भेजें",
+  "verify_login": "सत्यापन और लॉगिन",
+  "voice_recognition": "आवाज़ पहचान",
+  "fingerprint_login": "फिंगरप्रिंट लॉगिन",
+  "back_to_phone": "फोन नंबर पर वापस जाएं",
+  "enter_otp": "6-अंकीय ओटीपी दर्ज करें",
+  "having_trouble": "समस्या हो रही है? एसएमएस लॉगिन आज़माएं।",
+  "home": "होम",
+  "notifications": "सूचनाएं",
+  "profile": "प्रोफ़ाइल",
+  "chatbot": "सहायक",
+  "twin": "फार्म ट्विन",
+  "resources": "संसाधन",
+  "updates": "अपडेट"
+}

@@ -1,0 +1,19 @@
+{
+  "welcome": "പ്രോജക്ട് കിസാനിലേക്ക് സ്വാഗതം",
+  "phone_login": "ഫോൺ ലോഗിൻ",
+  "enter_phone": "നിങ്ങളുടെ ഫോൺ നമ്പർ നൽകുക",
+  "send_otp": "OTP അയയ്ക്കുക",
+  "verify_login": "പരിശോധിച്ച് ലോഗിൻ ചെയ്യുക",
+  "voice_recognition": "വോയിസ് റെക്കഗ്നിഷൻ",
+  "fingerprint_login": "ഫിംഗർപ്രിന്റ് ലോഗിൻ",
+  "back_to_phone": "ഫോൺ നമ്പറിലേക്ക് മടങ്ങുക",
+  "enter_otp": "6-അക്ക OTP നൽകുക",
+  "having_trouble": "പ്രശ്നമുണ്ടോ? SMS ലോഗിൻ ശ്രമിക്കുക.",
+  "home": "ഹോം",
+  "notifications": "അറിയിപ്പുകൾ",
+  "profile": "പ്രൊഫൈൽ",
+  "chatbot": "സഹായി",
+  "twin": "ഫാം ട്വിൻ",
+  "resources": "റിസോഴ്സുകൾ",
+  "updates": "അപ്ഡേറ്റുകൾ"
+}
