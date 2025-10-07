@@ -52,6 +52,7 @@ interface HomeScreenProps {
   onFeatureClick: (featureId: string) => void;
   onVoiceChat?: (question: string) => void; // open chatbot with initial question
   onRecommendationsClick?: () => void; // special handler for recommendations
+  onIdentifyTabClick?: (tab: "diagnose" | "scan" | "weed") => void; // special handler for identify tabs
 }
 
 interface WeatherData {
@@ -74,6 +75,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   onFeatureClick,
   onVoiceChat,
   onRecommendationsClick,
+  onIdentifyTabClick,
 }) => {
   const { firebaseUser } = useAuth();
   const { toast } = useToast();
@@ -1060,6 +1062,45 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
             }
             break;
 
+          case "identify":
+            // Handle identify feature with sub-actions for different tabs
+            const identifyTab = decision.subAction as
+              | "diagnose"
+              | "scan"
+              | "weed"
+              | undefined;
+            if (identifyTab && onIdentifyTabClick) {
+              onIdentifyTabClick(identifyTab);
+              onFeatureClick("identify");
+
+              // Get localized tab name
+              const tabNames: { [key: string]: { ml: string; en: string } } = {
+                diagnose: { ml: "രോഗനിർണയം", en: "Crop Diagnosis" },
+                scan: { ml: "കീട സ്കാൻ", en: "Pest Scan" },
+                weed: { ml: "കള തിരിച്ചറിയൽ", en: "Weed Identification" },
+              };
+
+              const tabName =
+                tabNames[identifyTab]?.[currentLanguage as "ml" | "en"] ||
+                tabNames[identifyTab]?.en;
+
+              toast({
+                title: getVoiceText("navigating"),
+                description: `${tabName} • ${(decision.confidence * 100).toFixed(0)}%`,
+              });
+            } else {
+              // Default to diagnose tab
+              if (onIdentifyTabClick) {
+                onIdentifyTabClick("diagnose");
+              }
+              onFeatureClick("identify");
+              toast({
+                title: getVoiceText("navigating"),
+                description: `${currentLanguage === "ml" ? "തിരിച്ചറിയൽ" : "Identify"} • ${(decision.confidence * 100).toFixed(0)}%`,
+              });
+            }
+            break;
+
           case "weather":
             // Weather should be handled as weather action, but in case it comes as navigate
             handleCurrentWeatherClick();
@@ -1082,8 +1123,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
                 home: { ml: "ഹോം", en: "Home" },
                 profile: { ml: "പ്രൊഫൈൽ", en: "Profile" },
                 diagnose: { ml: "രോഗനിർണയം", en: "Crop Diagnosis" },
+                identify: { ml: "തിരിച്ചറിയൽ", en: "Identify" },
                 market: { ml: "വിപണി വിലകൾ", en: "Market Prices" },
                 planner: { ml: "വിള ആസൂത്രണം", en: "Crop Planner" },
+                "soil-analyzer": { ml: "മണ്ണ് വിശകലനം", en: "Soil Analyzer" },
                 forum: { ml: "കർഷക ഫോറം", en: "Farmer Forum" },
                 knowledge: { ml: "വിജ്ഞാന കേന്ദ്രം", en: "Knowledge Center" },
                 buy: { ml: "ഇൻപുട്ടുകൾ വാങ്ങുക", en: "Buy Inputs" },

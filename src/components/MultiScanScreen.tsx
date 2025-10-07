@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 
 interface MultiScanScreenProps {
   onBack?: () => void;
+  initialTab?: "diagnose" | "scan" | "weed";
 }
 
 const tabs = [
@@ -15,8 +16,11 @@ const tabs = [
   { id: "weed", title: "Weed Identify" },
 ];
 
-const MultiScanScreen: React.FC<MultiScanScreenProps> = ({ onBack }) => {
-  const [active, setActive] = useState<string>(tabs[0].id);
+const MultiScanScreen: React.FC<MultiScanScreenProps> = ({
+  onBack,
+  initialTab = "diagnose",
+}) => {
+  const [active, setActive] = useState<string>(initialTab);
 
   // Get header config based on active tab
   const getHeaderConfig = () => {
@@ -106,7 +110,7 @@ const MultiScanScreen: React.FC<MultiScanScreenProps> = ({ onBack }) => {
                   return "text-gray-900 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-600/50";
                 }
               };
-              
+
               return (
                 <button
                   key={t.id}

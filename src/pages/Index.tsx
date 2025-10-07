@@ -27,7 +27,12 @@ const Index = () => {
   const { firebaseUser, loading } = useAuth();
   const [activeTab, setActiveTab] = useState("home");
   const [selectedLanguage, setSelectedLanguage] = useState("en");
-  const [twinActiveTab, setTwinActiveTab] = useState<"twin" | "recommendations">("twin");
+  const [twinActiveTab, setTwinActiveTab] = useState<
+    "twin" | "recommendations"
+  >("twin");
+  const [identifyActiveTab, setIdentifyActiveTab] = useState<
+    "diagnose" | "scan" | "weed"
+  >("diagnose");
   const [initialChatQuestion, setInitialChatQuestion] = useState<string | null>(
     null
   );
@@ -55,15 +60,19 @@ const Index = () => {
               setTwinActiveTab("recommendations");
               setActiveTab("twin");
             }}
+            onIdentifyTabClick={(tab) => {
+              setIdentifyActiveTab(tab);
+              setActiveTab("identify");
+            }}
           />
         );
       case "twin":
         return (
-          <FarmingTwinScreen 
+          <FarmingTwinScreen
             onBack={() => {
               setActiveTab("home");
               setTwinActiveTab("twin"); // Reset to twin tab when going back
-            }} 
+            }}
             activeTab={twinActiveTab}
           />
         );
@@ -89,7 +98,15 @@ const Index = () => {
       case "diagnose":
         return <DiagnoseCropScreen onBack={() => setActiveTab("home")} />;
       case "identify":
-        return <MultiScanScreen onBack={() => setActiveTab("home")} />;
+        return (
+          <MultiScanScreen
+            onBack={() => {
+              setActiveTab("home");
+              setIdentifyActiveTab("diagnose"); // Reset to diagnose tab when going back
+            }}
+            initialTab={identifyActiveTab}
+          />
+        );
       case "market":
         return <MarketPricesScreen onBack={() => setActiveTab("home")} />;
       case "planner":
@@ -140,6 +157,10 @@ const Index = () => {
             onRecommendationsClick={() => {
               setTwinActiveTab("recommendations");
               setActiveTab("twin");
+            }}
+            onIdentifyTabClick={(tab) => {
+              setIdentifyActiveTab(tab);
+              setActiveTab("identify");
             }}
           />
         );
