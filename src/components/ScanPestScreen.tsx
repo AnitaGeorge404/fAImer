@@ -393,25 +393,27 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({
       )}
 
       <div className="p-4 space-y-4">
-        {/* Tips */}
-        <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
-          <CardContent className="p-4">
-            <div className="flex items-start">
-              <Lightbulb className="h-5 w-5 text-yellow-500 dark:text-yellow-400 mr-3 mt-0.5" />
-              <div>
-                <h4 className="font-medium text-gray-800 dark:text-white mb-2">
-                  Pro Tips for Better Detection:
-                </h4>
-                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
-                  <li>• Take close-up photos of affected areas</li>
-                  <li>• Ensure good lighting for clear images</li>
-                  <li>• Include leaves, stems, or fruits showing damage</li>
-                  <li>• Check during early morning for best results</li>
-                </ul>
+        {/* Tips - Hide when scan result is available */}
+        {!scanResult && (
+          <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+            <CardContent className="p-4">
+              <div className="flex items-start">
+                <Lightbulb className="h-5 w-5 text-yellow-500 dark:text-yellow-400 mr-3 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-gray-800 dark:text-white mb-2">
+                    Pro Tips for Better Detection:
+                  </h4>
+                  <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                    <li>• Take close-up photos of affected areas</li>
+                    <li>• Ensure good lighting for clear images</li>
+                    <li>• Include leaves, stems, or fruits showing damage</li>
+                    <li>• Check during early morning for best results</li>
+                  </ul>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Scan Section */}
         <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
@@ -512,47 +514,49 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({
           </CardContent>
         </Card>
 
-        {/* Common Pests */}
-        <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
-          <CardHeader>
-            <CardTitle className="text-base dark:text-white">
-              Common Pests in Your Region
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {commonPests.map((pest, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
-                >
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-3">{pest.icon}</span>
-                    <div>
-                      <p className="font-medium text-gray-800 dark:text-white">
-                        {pest.name}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-300">
-                        Affects: {pest.crop}
-                      </p>
-                    </div>
-                  </div>
-                  <Badge
-                    className={
-                      pest.severity === "High"
-                        ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-                        : pest.severity === "Medium"
-                          ? "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300"
-                          : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                    }
+        {/* Common Pests - Hide when scan result is available */}
+        {!scanResult && (
+          <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+            <CardHeader>
+              <CardTitle className="text-base dark:text-white">
+                Common Pests in Your Region
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {commonPests.map((pest, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
                   >
-                    {pest.severity}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                    <div className="flex items-center">
+                      <span className="text-2xl mr-3">{pest.icon}</span>
+                      <div>
+                        <p className="font-medium text-gray-800 dark:text-white">
+                          {pest.name}
+                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-300">
+                          Affects: {pest.crop}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge
+                      className={
+                        pest.severity === "High"
+                          ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+                          : pest.severity === "Medium"
+                            ? "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300"
+                            : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                      }
+                    >
+                      {pest.severity}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Scan Result */}
         {scanResult && (
@@ -609,6 +613,24 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({
                     </span>
                   </div>
                 )}
+
+                {/* Severity Explanation */}
+                <div className="pt-3 border-t dark:border-gray-600">
+                  <h4 className="font-medium text-pink-600 dark:text-pink-400 mb-2 flex items-center">
+                    <AlertTriangle className="h-4 w-4 mr-2" />
+                    Severity Assessment:
+                  </h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                    {scanResult.severity === "High" &&
+                      "This is a severe pest infestation that requires immediate action. High pest populations can cause significant crop damage and yield loss."}
+                    {scanResult.severity === "Medium" &&
+                      "This pest infestation requires prompt attention. Take action soon to prevent population growth and minimize crop damage."}
+                    {scanResult.severity === "Low" &&
+                      "This is a minor pest presence that can be managed with regular monitoring and basic control measures."}
+                    {!["High", "Medium", "Low"].includes(scanResult.severity) &&
+                      "Severity assessment unavailable. Monitor the situation closely and consult with an agricultural expert if needed."}
+                  </p>
+                </div>
 
                 <div className="pt-3 border-t dark:border-gray-600">
                   <p className="text-sm text-gray-700 dark:text-gray-300">

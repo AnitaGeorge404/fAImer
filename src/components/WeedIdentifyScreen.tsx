@@ -302,29 +302,31 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
       )}
 
       <div className="p-4 space-y-4">
-        {/* Tips */}
-        <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
-          <CardContent className="p-4">
-            <div className="flex items-start">
-              <Lightbulb className="h-5 w-5 text-yellow-500 dark:text-yellow-400 mr-3 mt-0.5" />
-              <div>
-                <h4 className="font-medium text-gray-800 dark:text-white mb-2">
-                  Pro Tips for Better Identification:
-                </h4>
-                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
-                  <li>• Take clear, close-up photos of the entire weed</li>
-                  <li>
-                    • Ensure good lighting to capture leaf and stem details
-                  </li>
-                  <li>• Include the flower or seed head if present</li>
-                  <li>• Capture both leaf structure and growth pattern</li>
-                  <li>• Take photos of the root system if possible</li>
-                  <li>• Avoid blurry or dark images for best results</li>
-                </ul>
+        {/* Tips - Hide when result is available */}
+        {!result && (
+          <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+            <CardContent className="p-4">
+              <div className="flex items-start">
+                <Lightbulb className="h-5 w-5 text-yellow-500 dark:text-yellow-400 mr-3 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-gray-800 dark:text-white mb-2">
+                    Pro Tips for Better Identification:
+                  </h4>
+                  <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                    <li>• Take clear, close-up photos of the entire weed</li>
+                    <li>
+                      • Ensure good lighting to capture leaf and stem details
+                    </li>
+                    <li>• Include the flower or seed head if present</li>
+                    <li>• Capture both leaf structure and growth pattern</li>
+                    <li>• Take photos of the root system if possible</li>
+                    <li>• Avoid blurry or dark images for best results</li>
+                  </ul>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
           <CardHeader>
@@ -490,6 +492,28 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
                   <Badge className={getSeverityColor(result.severity)}>
                     {result.severity}
                   </Badge>
+                </div>
+
+                {/* Severity Explanation */}
+                <div className="pt-3 border-t dark:border-gray-600">
+                  <h4 className="font-medium text-green-600 dark:text-green-400 mb-2 flex items-center">
+                    <AlertTriangle className="h-4 w-4 mr-2" />
+                    Severity Assessment:
+                  </h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                    {result.severity === "High" &&
+                      "This is a highly invasive weed that requires immediate removal. It can quickly spread and compete aggressively with your crops for nutrients and water."}
+                    {result.severity === "Medium" &&
+                      "This weed requires attention and should be controlled soon. Regular monitoring and timely removal will help prevent it from spreading."}
+                    {result.severity === "Low" &&
+                      "This is a minor weed that can be managed with regular maintenance. It poses minimal threat to crop growth."}
+                    {result.severity === "None" &&
+                      "No significant weed detected. The plant appears to be non-invasive or beneficial."}
+                    {!["High", "Medium", "Low", "None"].includes(
+                      result.severity
+                    ) &&
+                      "Severity assessment unavailable. Monitor the plant and consult with an agricultural expert if concerned."}
+                  </p>
                 </div>
 
                 <div className="pt-3 border-t dark:border-gray-600 space-y-3">

@@ -440,27 +440,29 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
       )}
 
       <div className="p-4 space-y-4">
-        {/* Tips */}
-        <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
-          <CardContent className="p-4">
-            <div className="flex items-start">
-              <Lightbulb className="h-5 w-5 text-yellow-500 dark:text-yellow-400 mr-3 mt-0.5" />
-              <div>
-                <h4 className="font-medium text-gray-800 dark:text-white mb-2">
-                  Pro Tips for Better Diagnosis:
-                </h4>
-                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
-                  <li>• Take clear, close-up photos of affected leaves</li>
-                  <li>• Ensure good lighting to capture leaf details</li>
-                  <li>• Focus on areas showing disease symptoms</li>
-                  <li>• Include healthy parts for comparison</li>
-                  <li>• Take photos of both upper and lower leaf surfaces</li>
-                  <li>• Avoid blurry or dark images for best results</li>
-                </ul>
+        {/* Tips - Hide when diagnosis result is available */}
+        {!diagnosisResult && (
+          <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+            <CardContent className="p-4">
+              <div className="flex items-start">
+                <Lightbulb className="h-5 w-5 text-yellow-500 dark:text-yellow-400 mr-3 mt-0.5" />
+                <div>
+                  <h4 className="font-medium text-gray-800 dark:text-white mb-2">
+                    Pro Tips for Better Diagnosis:
+                  </h4>
+                  <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                    <li>• Take clear, close-up photos of affected leaves</li>
+                    <li>• Ensure good lighting to capture leaf details</li>
+                    <li>• Focus on areas showing disease symptoms</li>
+                    <li>• Include healthy parts for comparison</li>
+                    <li>• Take photos of both upper and lower leaf surfaces</li>
+                    <li>• Avoid blurry or dark images for best results</li>
+                  </ul>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Diagnosis Section */}
         <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
@@ -569,39 +571,41 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
           </CardContent>
         </Card>
 
-        {/* Common Diseases */}
-        <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
-          <CardHeader>
-            <CardTitle className="text-base dark:text-white">
-              Common Diseases in Your Region
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {commonDiseases.map((disease, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
-                >
-                  <div className="flex items-center">
-                    <span className="text-2xl mr-3">{disease.icon}</span>
-                    <div>
-                      <p className="font-medium text-gray-800 dark:text-white">
-                        {disease.name}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-300">
-                        Affects: {disease.crop}
-                      </p>
+        {/* Common Diseases - Hide when diagnosis result is available */}
+        {!diagnosisResult && (
+          <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+            <CardHeader>
+              <CardTitle className="text-base dark:text-white">
+                Common Diseases in Your Region
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {commonDiseases.map((disease, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                  >
+                    <div className="flex items-center">
+                      <span className="text-2xl mr-3">{disease.icon}</span>
+                      <div>
+                        <p className="font-medium text-gray-800 dark:text-white">
+                          {disease.name}
+                        </p>
+                        <p className="text-xs text-gray-600 dark:text-gray-300">
+                          Affects: {disease.crop}
+                        </p>
+                      </div>
                     </div>
+                    <Badge className={getSeverityColor(disease.severity)}>
+                      {disease.severity}
+                    </Badge>
                   </div>
-                  <Badge className={getSeverityColor(disease.severity)}>
-                    {disease.severity}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Diagnosis Result */}
         {diagnosisResult && (
@@ -656,6 +660,28 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
                     </span>
                   </div>
                 )}
+
+                {/* Severity Explanation */}
+                <div className="pt-3 border-t dark:border-gray-600">
+                  <h4 className="font-medium text-red-600 dark:text-red-400 mb-2 flex items-center">
+                    <AlertTriangle className="h-4 w-4 mr-2" />
+                    Severity Assessment:
+                  </h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    {diagnosisResult.severity === "High" &&
+                      "This is a severe disease that requires immediate attention. It can significantly impact crop yield and quality if left untreated."}
+                    {diagnosisResult.severity === "Medium" &&
+                      "This disease requires prompt treatment to prevent further spread. Early intervention will help minimize crop damage."}
+                    {diagnosisResult.severity === "Low" &&
+                      "This is a minor disease that can be managed with basic preventive measures. Monitor regularly to ensure it doesn't worsen."}
+                    {diagnosisResult.severity === "None" &&
+                      "No significant disease detected. Your plant appears healthy. Continue regular monitoring and maintenance."}
+                    {!["High", "Medium", "Low", "None"].includes(
+                      diagnosisResult.severity
+                    ) &&
+                      "Severity assessment unavailable. Please consult with an agricultural expert for detailed analysis."}
+                  </p>
+                </div>
 
                 <div className="pt-3 border-t dark:border-gray-600 space-y-3">
                   <div>
