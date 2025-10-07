@@ -25,6 +25,7 @@ import {
   Users,
   DollarSign,
   Layers,
+  Plus,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -609,6 +610,51 @@ const CropWise: React.FC<CropWiseProps> = ({ onBack }) => {
     ));
   };
 
+  const addToCropPlanner = (crop: CropRecommendation) => {
+    try {
+      // Get existing crop plans from localStorage
+      const existingPlans = localStorage.getItem("cropPlans");
+      let cropPlans = existingPlans ? JSON.parse(existingPlans) : [];
+
+      // Get the highest ID
+      const maxId =
+        cropPlans.length > 0
+          ? Math.max(...cropPlans.map((plan: any) => plan.id))
+          : 0;
+
+      // Create new crop plan
+      const newPlan = {
+        id: maxId + 1,
+        crop: crop.name,
+        area: `${farmerInput.farmSize} ${farmerInput.farmSizeUnit}`,
+        variety: crop.scientificName,
+        expectedYieldPerAcre: parseFloat(crop.yield.split("-")[0]) || 0,
+        currentMarketPrice:
+          parseFloat(crop.marketPrice.replace(/[^0-9.-]/g, "")) || 0,
+        expenses: parseFloat(farmerInput.budget) || 0,
+      };
+
+      // Add to crop plans
+      cropPlans.push(newPlan);
+      localStorage.setItem("cropPlans", JSON.stringify(cropPlans));
+
+      toast({
+        title: "Added to Crop Planner",
+        description: `${crop.name} has been added to your crop planner successfully!`,
+      });
+
+      // Close the dialog
+      setSelectedCrop(null);
+    } catch (error) {
+      console.error("Error adding to crop planner:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add crop to planner. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Onboarding Screen
   if (showOnboarding) {
     return (
@@ -975,20 +1021,6 @@ const CropWise: React.FC<CropWiseProps> = ({ onBack }) => {
 
   return (
     <div className="pb-20 bg-background min-h-screen">
-      {/* Header */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
-        <div className="flex items-center gap-4 p-4">
-          <div className="flex-1">
-            <h1 className="text-xl font-bold text-foreground">
-              {getTranslatedText("CropWise Recommendations")}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {getTranslatedText("Smart crop recommendations for your region")}
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div className="p-4 space-y-6">
         {/* Location Info */}
         {location && (
@@ -1277,6 +1309,15 @@ const CropWise: React.FC<CropWiseProps> = ({ onBack }) => {
                             ))}
                           </div>
                         </div>
+
+                        {/* Add to Crop Planner Button */}
+                        <Button
+                          className="w-full"
+                          onClick={() => addToCropPlanner(crop)}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add to Crop Planner
+                        </Button>
                       </div>
                     </DialogContent>
                   </Dialog>
