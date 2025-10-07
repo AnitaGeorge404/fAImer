@@ -48,9 +48,29 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({ onBack }) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [showCamera, setShowCamera] = useState(false);
-  const [cameraFacing, setCameraFacing] = useState<"user" | "environment">("environment");
+  const [cameraFacing, setCameraFacing] = useState<"user" | "environment">(
+    "environment"
+  );
 
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+  const commonWeeds = [
+    { name: "Bermuda Grass", crop: "All crops", severity: "High", icon: "🌾" },
+    {
+      name: "Pigweed",
+      crop: "Vegetables, Grains",
+      severity: "Medium",
+      icon: "🌿",
+    },
+    {
+      name: "Crabgrass",
+      crop: "Lawns, Gardens",
+      severity: "Medium",
+      icon: "🌱",
+    },
+    { name: "Dandelion", crop: "Lawns, Fields", severity: "Low", icon: "🌼" },
+    { name: "Bindweed", crop: "All crops", severity: "High", icon: "🌿" },
+  ];
 
   useEffect(() => {
     getCurrentLocation();
@@ -76,7 +96,9 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({ onBack }) => {
           setLocation(locationData);
         },
         (error) => {
-          setLocationError("Location access denied. Results may be less accurate.");
+          setLocationError(
+            "Location access denied. Results may be less accurate."
+          );
         }
       );
     } else {
@@ -99,7 +121,9 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({ onBack }) => {
   const startCamera = async () => {
     setShowCamera(true);
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: cameraFacing } });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: cameraFacing },
+      });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
@@ -205,9 +229,12 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({ onBack }) => {
       const jsonMatch = text.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const weedData = JSON.parse(jsonMatch[0]);
-        if (weedData.description) weedData.description = cleanText(weedData.description);
-        if (weedData.treatment) weedData.treatment = cleanText(weedData.treatment);
-        if (weedData.prevention) weedData.prevention = cleanText(weedData.prevention);
+        if (weedData.description)
+          weedData.description = cleanText(weedData.description);
+        if (weedData.treatment)
+          weedData.treatment = cleanText(weedData.treatment);
+        if (weedData.prevention)
+          weedData.prevention = cleanText(weedData.prevention);
         if (weedData.causes && Array.isArray(weedData.causes)) {
           weedData.causes = weedData.causes.map((c: string) => cleanText(c));
         }
@@ -221,7 +248,8 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({ onBack }) => {
       setResult({
         name: "Analysis Error",
         confidence: 0,
-        description: "Failed to analyze the image. Please try again with a clearer photo.",
+        description:
+          "Failed to analyze the image. Please try again with a clearer photo.",
         treatment: "Retake the photo ensuring good lighting and focus.",
         prevention: "N/A",
         severity: "Unknown",
@@ -247,15 +275,22 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({ onBack }) => {
   };
 
   return (
-    <div className="pb-20 bg-gray-50 dark:bg-background min-h-screen transition-colors duration-300">
+    <div className="pb-20 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
       <div className="bg-green-600 dark:bg-green-700 text-white p-4 shadow-lg">
         <div className="flex items-center">
-          <Button variant="ghost" size="icon" onClick={onBack} className="mr-3 text-white hover:bg-white/20 dark:hover:bg-white/10">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onBack}
+            className="mr-3 text-white hover:bg-white/20 dark:hover:bg-white/10"
+          >
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
             <h1 className="text-xl font-bold">Identify Weed</h1>
-            <p className="text-green-100 text-sm">AI-powered weed identification</p>
+            <p className="text-green-100 dark:text-green-200 text-sm">
+              AI-powered weed identification
+            </p>
           </div>
         </div>
       </div>
@@ -276,39 +311,78 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({ onBack }) => {
               </div>
             )}
             {locationError && (
-              <div className="text-sm text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 p-2 rounded-lg">{locationError}</div>
+              <div className="text-sm text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 p-2 rounded-lg">
+                {locationError}
+              </div>
             )}
 
             {/* Camera / Upload controls */}
             {showCamera ? (
               <div className="space-y-3">
                 <div className="relative bg-black rounded-lg overflow-hidden">
-                  <video ref={videoRef} autoPlay playsInline className="w-full h-48 object-cover" />
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    className="w-full h-64 object-cover"
+                  />
                 </div>
                 <div className="flex gap-2">
-                  <Button onClick={capturePhoto} className="flex-1">Capture</Button>
-                  <Button variant="outline" onClick={() => { stopCamera(); setShowCamera(false); }}>Cancel</Button>
+                  <Button onClick={capturePhoto} className="flex-1">
+                    <Camera className="h-4 w-4 mr-2" />
+                    Capture
+                  </Button>
+                  <Button variant="outline" onClick={stopCamera}>
+                    Cancel
+                  </Button>
                 </div>
               </div>
             ) : (
-              <div className="flex gap-2">
-                <Button className="h-24 flex-1 flex flex-col items-center justify-center" onClick={() => startCamera()}>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  variant="outline"
+                  className="h-24 flex flex-col items-center justify-center space-y-2 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
+                  onClick={startCamera}
+                >
                   <Camera className="h-6 w-6" />
                   <span className="text-xs">Take Photo</span>
                 </Button>
-                <Button className="h-24 flex-1 flex flex-col items-center justify-center" onClick={() => document.getElementById("weed-file-input")?.click()}>
+                <Button
+                  variant="outline"
+                  className="h-24 flex flex-col items-center justify-center space-y-2 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
+                  onClick={() =>
+                    document.getElementById("weed-file-input")?.click()
+                  }
+                >
                   <Upload className="h-6 w-6" />
                   <span className="text-xs">Upload Image</span>
                 </Button>
               </div>
             )}
 
-            <input id="weed-file-input" type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+            <input
+              id="weed-file-input"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageUpload}
+              aria-label="Upload image file"
+            />
 
             {selectedImage && (
               <div className="mt-4">
-                <img src={selectedImage} alt="Selected weed" className="w-full h-48 object-cover rounded-lg" />
-                <Button onClick={identifyWeed} disabled={isIdentifying} className="w-full mt-3 bg-green-600 hover:bg-green-700">{isIdentifying ? "Identifying..." : "Identify Weed"}</Button>
+                <img
+                  src={selectedImage}
+                  alt="Selected weed"
+                  className="w-full h-48 object-cover rounded-lg"
+                />
+                <Button
+                  onClick={identifyWeed}
+                  disabled={isIdentifying}
+                  className="w-full mt-3 bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700"
+                >
+                  {isIdentifying ? "Identifying..." : "Identify Weed"}
+                </Button>
               </div>
             )}
           </CardContent>
@@ -327,33 +401,59 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({ onBack }) => {
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="font-medium dark:text-white">Weed:</span>
-                  <Badge className={result.confidence > 0 ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" : "bg-gray-100 text-gray-800"}>{result.name}</Badge>
+                  <Badge
+                    className={
+                      result.confidence > 0
+                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                        : "bg-gray-100 text-gray-800"
+                    }
+                  >
+                    {result.name}
+                  </Badge>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="font-medium dark:text-white">Confidence:</span>
-                  <span className="text-green-600 dark:text-green-400 font-bold">{result.confidence}%</span>
+                  <span className="font-medium dark:text-white">
+                    Confidence:
+                  </span>
+                  <span className="text-green-600 dark:text-green-400 font-bold">
+                    {result.confidence}%
+                  </span>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <span className="font-medium dark:text-white">Severity:</span>
-                  <Badge className={getSeverityColor(result.severity)}>{result.severity}</Badge>
+                  <Badge className={getSeverityColor(result.severity)}>
+                    {result.severity}
+                  </Badge>
                 </div>
 
                 <div className="pt-3 border-t dark:border-gray-600 space-y-3">
                   <div>
-                    <h4 className="font-medium text-green-600 dark:text-green-400 mb-2">Description:</h4>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">{result.description}</p>
+                    <h4 className="font-medium text-green-600 dark:text-green-400 mb-2">
+                      Description:
+                    </h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      {result.description}
+                    </p>
                   </div>
 
                   <div>
-                    <h4 className="font-medium text-green-600 dark:text-green-400 mb-2">Treatment:</h4>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">{result.treatment}</p>
+                    <h4 className="font-medium text-green-600 dark:text-green-400 mb-2">
+                      Treatment:
+                    </h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      {result.treatment}
+                    </p>
                   </div>
 
                   <div>
-                    <h4 className="font-medium text-green-600 dark:text-green-400 mb-2">Prevention:</h4>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">{result.prevention}</p>
+                    <h4 className="font-medium text-green-600 dark:text-green-400 mb-2">
+                      Prevention:
+                    </h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      {result.prevention}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -363,7 +463,10 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({ onBack }) => {
             <div className="grid grid-cols-1 gap-4">
               <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
                 <CardHeader>
-                  <CardTitle className="text-base dark:text-white flex items-center"><CheckCircle className="h-4 w-4 mr-2 text-green-500"/>Causes</CardTitle>
+                  <CardTitle className="text-base dark:text-white flex items-center">
+                    <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                    Causes
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
@@ -376,17 +479,27 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({ onBack }) => {
 
               <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
                 <CardHeader>
-                  <CardTitle className="text-base dark:text-white flex items-center"><TrendingUp className="h-4 w-4 mr-2"/>Seasonality</CardTitle>
+                  <CardTitle className="text-base dark:text-white flex items-center">
+                    <TrendingUp className="h-4 w-4 mr-2" />
+                    Seasonality
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     {result.seasonalData.map((data, idx) => (
                       <div key={idx} className="flex items-center space-x-3">
-                        <span className="text-sm font-medium w-10 dark:text-white">{data.month}</span>
+                        <span className="text-sm font-medium w-10 dark:text-white">
+                          {data.month}
+                        </span>
                         <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-3 relative overflow-hidden">
-                          <div className="bg-gradient-to-r from-green-400 to-red-500 h-full rounded-full" style={{ width: `${data.occurrence}%` }} />
+                          <div
+                            className="bg-gradient-to-r from-green-400 to-red-500 h-full rounded-full"
+                            style={{ width: `${data.occurrence}%` }}
+                          />
                         </div>
-                        <span className="text-sm text-gray-600 dark:text-gray-400 w-10">{data.occurrence}%</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400 w-10">
+                          {data.occurrence}%
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -395,6 +508,64 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({ onBack }) => {
             </div>
           </>
         )}
+
+        {/* Common Weeds */}
+        <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+          <CardHeader>
+            <CardTitle className="text-base dark:text-white">
+              Common Weeds in Your Region
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {commonWeeds.map((weed, index) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
+                >
+                  <div className="flex items-center">
+                    <span className="text-2xl mr-3">{weed.icon}</span>
+                    <div>
+                      <p className="font-medium text-gray-800 dark:text-white">
+                        {weed.name}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-300">
+                        Affects: {weed.crop}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge className={getSeverityColor(weed.severity)}>
+                    {weed.severity}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Tips */}
+        <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+          <CardContent className="p-4">
+            <div className="flex items-start">
+              <Lightbulb className="h-5 w-5 text-yellow-500 dark:text-yellow-400 mr-3 mt-0.5" />
+              <div>
+                <h4 className="font-medium text-gray-800 dark:text-white mb-2">
+                  Pro Tips for Better Identification:
+                </h4>
+                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                  <li>• Take clear, close-up photos of the entire weed</li>
+                  <li>
+                    • Ensure good lighting to capture leaf and stem details
+                  </li>
+                  <li>• Include the flower or seed head if present</li>
+                  <li>• Capture both leaf structure and growth pattern</li>
+                  <li>• Take photos of the root system if possible</li>
+                  <li>• Avoid blurry or dark images for best results</li>
+                </ul>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <canvas ref={canvasRef} className="hidden" />
