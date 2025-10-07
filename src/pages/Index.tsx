@@ -13,6 +13,7 @@ import KnowledgeCenterScreen from "../components/KnowledgeCenterScreen";
 import KnowledgeScreen from "../components/KnowledgeScreen";
 import BuyInputsScreen from "../components/BuyInputsScreen";
 import ScanPestScreen from "../components/ScanPestScreen";
+import MultiScanScreen from "../components/MultiScanScreen";
 import ExpenseTrackerScreen from "../components/ExpenseTrackerScreen";
 import AgricultureNewsScreen from "../components/AgricultureNewsScreen";
 import GovtSchemesScreen from "../components/GovtSchemesScreen";
@@ -86,6 +87,8 @@ const Index = () => {
         return <ProfileScreen onBack={() => setActiveTab("home")} />;
       case "diagnose":
         return <DiagnoseCropScreen onBack={() => setActiveTab("home")} />;
+      case "identify":
+        return <MultiScanScreen onBack={() => setActiveTab("home")} />;
       case "market":
         return <MarketPricesScreen onBack={() => setActiveTab("home")} />;
       case "planner":

@@ -583,11 +583,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   };
   const features = [
     {
-      id: "diagnose",
-      title: getTranslatedText("Diagnose Crop"),
-      icon: TestTube,
+      id: "identify",
+      title: getTranslatedText("Identify"),
+      icon: Camera,
       color: "bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-300",
-      image: "/lovable-uploads/02d46ce4-171b-42cd-a9a3-686dbd10e8de.png",
+      image: "/lovable-uploads/fb9c0289-77d0-4856-9028-76b4f16989dd.png",
+      // 'identify' will open the unified MultiScanScreen which hosts Diagnose, Pest Scan and Weed Identify
     },
     {
       id: "market",
@@ -604,11 +605,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       image: "/lovable-uploads/5da1f9d1-e030-46f1-9d61-291928623066.png",
     },
     {
-      id: "scan",
-      title: getTranslatedText("Scan Pest"),
-      icon: Camera,
-      color: "bg-pink-100 text-pink-600 dark:bg-pink-950 dark:text-pink-300",
-      image: "/lovable-uploads/f2bb06a9-32a5-4aa1-bf76-447eb1fb0c64.png",
+      id: "twin",
+      title: getTranslatedText("Farming Twin"),
+      icon: Users,
+      color:
+        "bg-purple-100 text-purple-600 dark:bg-purple-950 dark:text-purple-300",
+      image: "/lovable-uploads/0978174b-ae5f-40db-bd58-07833d59465a.png",
     },
     {
       id: "twin",
@@ -1518,7 +1520,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
                 >
                   <CardContent className="p-4 text-center m-0">
                     <div className="w-24 h-24 text-primary flex items-center justify-center mx-auto mb-1 transition-colors duration-300">
-                      {feature.id === "diagnose" ? (
+                      {feature.id === "identify" ? (
                         <img
                           src="/lovable-uploads/fb9c0289-77d0-4856-9028-76b4f16989dd.png"
                           alt={`${feature.title} icon`}
