@@ -22,6 +22,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 interface ScanPestScreenProps {
   onBack?: () => void;
+  hideHeader?: boolean;
 }
 
 interface PestResult {
@@ -47,7 +48,10 @@ interface LocationData {
   region?: string;
 }
 
-const ScanPestScreen: React.FC<ScanPestScreenProps> = ({ onBack }) => {
+const ScanPestScreen: React.FC<ScanPestScreenProps> = ({
+  onBack,
+  hideHeader = false,
+}) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [scanResult, setScanResult] = useState<PestResult | null>(null);
   const [isScanning, setIsScanning] = useState(false);
@@ -367,24 +371,26 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({ onBack }) => {
   return (
     <div className="pb-20 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
       {/* Header */}
-      <div className="bg-pink-600 dark:bg-pink-700 text-white p-4 shadow-lg">
-        <div className="flex items-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onBack}
-            className="mr-3 text-white hover:bg-white/20 dark:hover:bg-white/10"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-xl font-bold">Scan & Detect Pests</h1>
-            <p className="text-pink-100 dark:text-pink-200 text-sm">
-              AI-powered pest identification
-            </p>
+      {!hideHeader && (
+        <div className="bg-pink-600 dark:bg-pink-700 text-white p-4 shadow-lg">
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onBack}
+              className="mr-3 text-white hover:bg-white/20 dark:hover:bg-white/10"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-xl font-bold">Scan & Detect Pests</h1>
+              <p className="text-pink-100 dark:text-pink-200 text-sm">
+                AI-powered pest identification
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="p-4 space-y-4">
         {/* Tips */}

@@ -36,9 +36,13 @@ interface LocationData {
 
 interface WeedIdentifyScreenProps {
   onBack?: () => void;
+  hideHeader?: boolean;
 }
 
-const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({ onBack }) => {
+const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
+  onBack,
+  hideHeader = false,
+}) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isIdentifying, setIsIdentifying] = useState(false);
   const [result, setResult] = useState<WeedResult | null>(null);
@@ -276,24 +280,26 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({ onBack }) => {
 
   return (
     <div className="pb-20 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
-      <div className="bg-green-600 dark:bg-green-700 text-white p-4 shadow-lg">
-        <div className="flex items-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onBack}
-            className="mr-3 text-white hover:bg-white/20 dark:hover:bg-white/10"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-xl font-bold">Identify Weed</h1>
-            <p className="text-green-100 dark:text-green-200 text-sm">
-              AI-powered weed identification
-            </p>
+      {!hideHeader && (
+        <div className="bg-green-600 dark:bg-green-700 text-white p-4 shadow-lg">
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onBack}
+              className="mr-3 text-white hover:bg-white/20 dark:hover:bg-white/10"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-xl font-bold">Identify Weed</h1>
+              <p className="text-green-100 dark:text-green-200 text-sm">
+                AI-powered weed identification
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="p-4 space-y-4">
         {/* Tips */}

@@ -18,24 +18,79 @@ const tabs = [
 const MultiScanScreen: React.FC<MultiScanScreenProps> = ({ onBack }) => {
   const [active, setActive] = useState<string>(tabs[0].id);
 
-  return (
-    <div className="pb-20 bg-background min-h-screen transition-colors duration-300">
-      {/* Top glass slider */}
-      <div className="sticky top-0 z-20 p-3 bg-white/30 backdrop-blur-md border-b border-border flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={onBack} className="p-2">
-          <ArrowLeft className="h-4 w-4" />
-        </Button>
+  // Get header config based on active tab
+  const getHeaderConfig = () => {
+    switch (active) {
+      case "diagnose":
+        return {
+          title: "Diagnose Crop",
+          subtitle: "AI-powered crop disease detection",
+          bgColor:
+            "bg-gradient-to-r from-red-600 to-red-700 dark:from-red-700 dark:to-red-800",
+          textColor: "text-red-100 dark:text-red-200",
+        };
+      case "scan":
+        return {
+          title: "Scan & Detect Pests",
+          subtitle: "AI-powered pest identification",
+          bgColor: "bg-pink-600 dark:bg-pink-700",
+          textColor: "text-pink-100 dark:text-pink-200",
+        };
+      case "weed":
+        return {
+          title: "Identify Weed",
+          subtitle: "AI-powered weed identification",
+          bgColor: "bg-green-600 dark:bg-green-700",
+          textColor: "text-green-100 dark:text-green-200",
+        };
+      default:
+        return {
+          title: "Scanner",
+          subtitle: "AI-powered analysis",
+          bgColor: "bg-gray-600 dark:bg-gray-700",
+          textColor: "text-gray-100 dark:text-gray-200",
+        };
+    }
+  };
 
-        <div className="flex-1 flex items-center gap-2">
-          <div className="flex items-center bg-white/20 backdrop-blur-sm rounded-full p-1 gap-1 shadow-sm">
+  const headerConfig = getHeaderConfig();
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+      {/* Fixed Header */}
+      <div
+        className={`fixed top-0 left-0 right-0 z-30 ${headerConfig.bgColor} text-white p-4 shadow-lg`}
+      >
+        <div className="flex items-center">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onBack}
+            className="mr-3 text-white hover:bg-white/20 dark:hover:bg-white/10"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div>
+            <h1 className="text-xl font-bold">{headerConfig.title}</h1>
+            <p className={`${headerConfig.textColor} text-sm`}>
+              {headerConfig.subtitle}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Fixed Tab Switcher - positioned just below header */}
+      <div className="fixed top-[72px] left-0 right-0 z-20 bg-white/95 dark:bg-gray-800/95 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="flex items-center justify-center p-2">
+          <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-full p-1 gap-1 shadow-sm">
             {tabs.map((t) => (
               <button
                 key={t.id}
                 onClick={() => setActive(t.id)}
-                className={`px-4 py-2 rounded-full transition-all text-sm ${
+                className={`px-4 py-2 rounded-full transition-all text-sm font-medium ${
                   active === t.id
-                    ? "bg-white text-black shadow"
-                    : "text-black/70 hover:bg-white/10"
+                    ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-md"
+                    : "text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-600/50"
                 }`}
                 aria-pressed={active === t.id}
               >
@@ -46,11 +101,19 @@ const MultiScanScreen: React.FC<MultiScanScreenProps> = ({ onBack }) => {
         </div>
       </div>
 
-      {/* Embedded screens - only render the active one to avoid duplicate camera usage */}
-      <div>
-        {active === "diagnose" && <DiagnoseCropScreen onBack={onBack} />}
-        {active === "scan" && <ScanPestScreen onBack={onBack} />}
-        {active === "weed" && <WeedIdentifyScreen onBack={onBack} />}
+      {/* Content area with padding for fixed elements */}
+      <div className="pt-[128px] pb-20">
+        {/* Embedded screens - only render the active one to avoid duplicate camera usage */}
+        {/* Pass hideHeader to prevent duplicate headers */}
+        {active === "diagnose" && (
+          <DiagnoseCropScreen onBack={onBack} hideHeader={true} />
+        )}
+        {active === "scan" && (
+          <ScanPestScreen onBack={onBack} hideHeader={true} />
+        )}
+        {active === "weed" && (
+          <WeedIdentifyScreen onBack={onBack} hideHeader={true} />
+        )}
       </div>
     </div>
   );

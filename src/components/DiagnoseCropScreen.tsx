@@ -45,9 +45,13 @@ interface LocationData {
 
 interface DiagnoseCropScreenProps {
   onBack?: () => void;
+  hideHeader?: boolean;
 }
 
-const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({ onBack }) => {
+const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
+  onBack,
+  hideHeader = false,
+}) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [diagnosisResult, setDiagnosisResult] =
     useState<DiagnosisResult | null>(null);
@@ -414,24 +418,26 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({ onBack }) => {
   return (
     <div className="pb-20 bg-gray-50 dark:bg-background min-h-screen transition-colors duration-300">
       {/* Header */}
-      <div className="bg-gradient-to-r from-red-600 to-red-700 dark:from-red-700 dark:to-red-800 text-white p-4 shadow-lg">
-        <div className="flex items-center">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onBack}
-            className="mr-3 text-white hover:bg-white/20 dark:hover:bg-white/10"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="text-xl font-bold">Diagnose Crop</h1>
-            <p className="text-red-100 dark:text-red-200 text-sm">
-              AI-powered crop disease detection
-            </p>
+      {!hideHeader && (
+        <div className="bg-gradient-to-r from-red-600 to-red-700 dark:from-red-700 dark:to-red-800 text-white p-4 shadow-lg">
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onBack}
+              className="mr-3 text-white hover:bg-white/20 dark:hover:bg-white/10"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-xl font-bold">Diagnose Crop</h1>
+              <p className="text-red-100 dark:text-red-200 text-sm">
+                AI-powered crop disease detection
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="p-4 space-y-4">
         {/* Tips */}
