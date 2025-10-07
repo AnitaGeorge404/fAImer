@@ -275,13 +275,8 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({
 
         setScanResult(pestData);
 
-        // Automatically open TodoModal with dynamic treatment suggestion
-        const name = (pestData.name || "").toLowerCase();
-        if (name && !["no pest detected", "analysis error"].includes(name) && !name.includes("no")) {
-          const suggestion = `Treat ${pestData.name} - ${pestData.treatment?.split(".")[0] || "Recommended treatment"}`;
-          setSuggestionText(suggestion);
-          setTodoModalOpen(true); // Open TodoModal directly
-        }
+        // Auto-popup removed - let users review pest analysis before adding to planner
+        // Users can manually add treatment tasks after reviewing the full scan results
       } else {
         throw new Error("Invalid response format from AI");
       }
@@ -675,7 +670,7 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({
                 <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
                   <Button
                     onClick={() => {
-                      const treatmentTask = `Control ${scanResult.name || 'pest'} - ${formatListItems(scanResult.treatment)[0] || 'Apply recommended treatment'}`;
+                      const treatmentTask = `Control ${scanResult.name || "pest"} - ${formatListItems(scanResult.treatment)[0] || "Apply recommended treatment"}`;
                       // Set the suggestion and open TodoModal
                       setSuggestionText(treatmentTask);
                       setTodoModalOpen(true);
@@ -788,7 +783,7 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({
           </>
         )}
       </div>
-      
+
       {/* SuggestionPopup removed per user request */}
 
       <TodoModal

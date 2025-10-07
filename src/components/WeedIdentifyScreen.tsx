@@ -69,44 +69,55 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
     try {
       const raw = localStorage.getItem("cropPlans");
       if (!raw) return null;
-      
+
       const cropPlans = JSON.parse(raw);
       if (!Array.isArray(cropPlans) || cropPlans.length === 0) return null;
-      
+
       // Get crop names from planner
-      const plannerCrops = cropPlans.map((plan: any) => plan.crop?.toLowerCase());
-      
+      const plannerCrops = cropPlans.map((plan: any) =>
+        plan.crop?.toLowerCase()
+      );
+
       // Common weed-crop mappings
       const weedCropMappings: Record<string, string[]> = {
-        "bermuda grass": ["tomato", "potato", "onion", "wheat", "rice", "corn", "maize"],
-        "pigweed": ["tomato", "potato", "bean", "corn", "maize", "soybean"],
-        "crabgrass": ["rice", "wheat", "onion", "carrot"],
-        "dandelion": ["tomato", "lettuce", "spinach", "cabbage"],
-        "bindweed": ["potato", "tomato", "bean", "pea", "corn", "wheat"],
-        "chickweed": ["lettuce", "spinach", "carrot", "onion"],
-        "purslane": ["tomato", "pepper", "eggplant"],
+        "bermuda grass": [
+          "tomato",
+          "potato",
+          "onion",
+          "wheat",
+          "rice",
+          "corn",
+          "maize",
+        ],
+        pigweed: ["tomato", "potato", "bean", "corn", "maize", "soybean"],
+        crabgrass: ["rice", "wheat", "onion", "carrot"],
+        dandelion: ["tomato", "lettuce", "spinach", "cabbage"],
+        bindweed: ["potato", "tomato", "bean", "pea", "corn", "wheat"],
+        chickweed: ["lettuce", "spinach", "carrot", "onion"],
+        purslane: ["tomato", "pepper", "eggplant"],
         "lamb's quarters": ["beet", "spinach", "chard"],
         "johnson grass": ["corn", "maize", "sorghum", "cotton"],
-        "foxtail": ["corn", "rice", "wheat", "soybean"]
+        foxtail: ["corn", "rice", "wheat", "soybean"],
       };
-      
+
       const weedLower = weedName.toLowerCase();
       let affectedCrops: string[] = [];
-      
+
       // Check direct mappings
       for (const [weed, crops] of Object.entries(weedCropMappings)) {
         if (weedLower.includes(weed) || weed.includes(weedLower)) {
           affectedCrops = [...affectedCrops, ...crops];
         }
       }
-      
+
       // Find matching crops in planner
-      const matchingCrops = plannerCrops.filter((crop: string) => 
-        affectedCrops.some(affectedCrop => 
-          crop?.includes(affectedCrop) || affectedCrop.includes(crop)
+      const matchingCrops = plannerCrops.filter((crop: string) =>
+        affectedCrops.some(
+          (affectedCrop) =>
+            crop?.includes(affectedCrop) || affectedCrop.includes(crop)
         )
       );
-      
+
       return matchingCrops.length > 0 ? matchingCrops : null;
     } catch (error) {
       console.error("Error checking crop planner:", error);
@@ -301,16 +312,8 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
 
         setResult(weedData);
 
-        // Automatically open TodoModal after successful diagnosis
-        const name = (weedData.name || "").toLowerCase();
-        if (name && !["no weed detected", "analysis error"].includes(name) && !name.includes("no")) {
-          const suggestion = `Remove ${weedData.name} - ${weedData.treatment?.split(".")[0] || "Manual removal recommended"}`;
-          setSuggestionText(suggestion);
-          // Get all affected crops for reference (still useful for highlighting)
-          const affectedCropsList = checkCropPlannerForAffectedCrops(weedData.name);
-          setAffectedCrops(affectedCropsList || []);
-          setTodoModalOpen(true); // Always open TodoModal for valid weed detection
-        }
+        // Auto-popup removed - let users review weed identification before adding to planner
+        // Users can manually add removal tasks after reviewing the full analysis
       } else {
         throw new Error("Invalid response format from AI");
       }
@@ -537,18 +540,28 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
               <CardContent className="p-6 space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Identified Weed</p>
-                    <p className="font-bold text-lg text-gray-800 dark:text-white">{result.name}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      Identified Weed
+                    </p>
+                    <p className="font-bold text-lg text-gray-800 dark:text-white">
+                      {result.name}
+                    </p>
                   </div>
                   <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Confidence Level</p>
-                    <p className="font-bold text-lg text-green-600 dark:text-green-400">{result.confidence}%</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      Confidence Level
+                    </p>
+                    <p className="font-bold text-lg text-green-600 dark:text-green-400">
+                      {result.confidence}%
+                    </p>
                   </div>
                 </div>
-                
+
                 <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Threat Level</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Threat Level
+                    </p>
                     <Badge className={getSeverityColor(result.severity)}>
                       {result.severity}
                     </Badge>
@@ -562,7 +575,9 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
                       "✅ Low Priority: Manageable with regular maintenance."}
                     {result.severity === "None" &&
                       "ℹ️ No significant threat detected."}
-                    {!["High", "Medium", "Low", "None"].includes(result.severity) &&
+                    {!["High", "Medium", "Low", "None"].includes(
+                      result.severity
+                    ) &&
                       "Assessment unavailable. Consult an expert if concerned."}
                   </p>
                 </div>
@@ -596,7 +611,7 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
                   <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
                     <Button
                       onClick={() => {
-                        const treatmentTask = `Remove ${result.name} weed - ${result.treatment?.split('.')[0] || 'Apply recommended weed control'}`;
+                        const treatmentTask = `Remove ${result.name} weed - ${result.treatment?.split(".")[0] || "Apply recommended weed control"}`;
                         // Set the suggestion and open TodoModal
                         setSuggestionText(treatmentTask);
                         setTodoModalOpen(true);
@@ -634,7 +649,9 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
                       {result.causes.map((cause, i) => (
                         <li key={i} className="flex items-start">
                           <span className="text-purple-500 mr-2">•</span>
-                          <span className="text-sm text-gray-700 dark:text-gray-300">{cause}</span>
+                          <span className="text-sm text-gray-700 dark:text-gray-300">
+                            {cause}
+                          </span>
                         </li>
                       ))}
                     </ul>
@@ -677,7 +694,7 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
       </div>
 
       <canvas ref={canvasRef} className="hidden" />
-      
+
       <TodoModal
         open={todoModalOpen}
         suggestion={suggestionText}

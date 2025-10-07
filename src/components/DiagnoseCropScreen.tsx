@@ -288,19 +288,8 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
 
         setDiagnosisResult(diseaseData);
 
-        // Automatically open TodoModal with dynamic treatment suggestion
-        const name = (diseaseData.disease || "").toLowerCase();
-        if (
-          name &&
-          !["healthy plant", "analysis error"].includes(name) &&
-          !name.includes("no")
-        ) {
-          const suggestion = `Treat ${diseaseData.affectedCrop || diseaseData.disease} - ${(diseaseData.treatment || "Follow recommended treatment").split(".")[0]}`;
-          setSuggestionText(suggestion);
-          setTodoModalOpen(true); // Open TodoModal directly
-        }
-
-        // Popup disabled per user request - diagnosis completes without notification
+        // Auto-popup removed - let users review diagnosis before adding to planner
+        // Users can manually add treatment tasks after reviewing the full analysis
         // toast({
         //   title: "Diagnosis Complete",
         //   description: `Disease analysis completed with ${diseaseData.confidence}% confidence`,
@@ -738,7 +727,7 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
                 <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
                   <Button
                     onClick={() => {
-                      const treatmentTask = `Treat ${diagnosisResult.disease || 'crop issue'} - ${formatListItems(diagnosisResult.treatment)[0] || 'Apply recommended treatment'}`;
+                      const treatmentTask = `Treat ${diagnosisResult.disease || "crop issue"} - ${formatListItems(diagnosisResult.treatment)[0] || "Apply recommended treatment"}`;
                       // Set the suggestion and open TodoModal
                       setSuggestionText(treatmentTask);
                       setTodoModalOpen(true);
@@ -857,7 +846,7 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
           </>
         )}
       </div>
-      
+
       {/* SuggestionPopup removed per user request */}
 
       <TodoModal
