@@ -529,105 +529,124 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
         {/* Result */}
         {result && (
           <>
-            {/* Main Identification Results */}
-            <Card className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-green-200 dark:border-green-800 shadow-lg">
-              <CardHeader className="bg-green-600 dark:bg-green-700 text-white rounded-t-lg">
-                <CardTitle className="text-lg flex items-center">
-                  <AlertTriangle className="h-6 w-6 mr-2" />
-                  🌿 Weed Identification Result
+            {/* Main Identification Result */}
+            <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center dark:text-white">
+                  <AlertTriangle className="h-5 w-5 mr-2 text-green-600 dark:text-green-400" />
+                  Weed Identification Result
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                      Identified Weed
-                    </p>
-                    <p className="font-bold text-lg text-gray-800 dark:text-white">
-                      {result.name}
-                    </p>
-                  </div>
-                  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-                      Confidence Level
-                    </p>
-                    <p className="font-bold text-lg text-green-600 dark:text-green-400">
-                      {result.confidence}%
-                    </p>
-                  </div>
+              <CardContent className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium dark:text-white">Weed:</span>
+                  <Badge
+                    className={`${result.confidence > 0 ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"}`}
+                  >
+                    {result.name}
+                  </Badge>
                 </div>
-
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Threat Level
-                    </p>
-                    <Badge className={getSeverityColor(result.severity)}>
-                      {result.severity}
-                    </Badge>
+                <div className="flex items-center justify-between">
+                  <span className="font-medium dark:text-white">
+                    Confidence:
+                  </span>
+                  <span className="text-green-600 dark:text-green-400 font-bold">
+                    {result.confidence}%
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-medium dark:text-white">Severity:</span>
+                  <Badge className={getSeverityColor(result.severity)}>
+                    {result.severity}
+                  </Badge>
+                </div>
+                {location && (
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium dark:text-white">
+                      <MapPin className="h-4 w-4 inline mr-1" />
+                      Location:
+                    </span>
+                    <span className="text-gray-700 dark:text-gray-300">
+                      {location.city}
+                    </span>
                   </div>
+                )}
+
+                {/* Severity Explanation */}
+                <div className="pt-3 border-t dark:border-gray-600">
+                  <h4 className="font-medium text-green-600 dark:text-green-400 mb-2 flex items-center">
+                    <AlertTriangle className="h-4 w-4 mr-2" />
+                    Threat Assessment:
+                  </h4>
                   <p className="text-sm text-gray-700 dark:text-gray-300">
                     {result.severity === "High" &&
-                      "🚨 High Priority: Immediate removal required. Highly invasive and competitive."}
+                      "High Priority: Immediate removal required. This weed is highly invasive and competitive with crops."}
                     {result.severity === "Medium" &&
-                      "⚠️ Medium Priority: Control soon. Regular monitoring recommended."}
+                      "Medium Priority: Control soon. Regular monitoring recommended to prevent spread."}
                     {result.severity === "Low" &&
-                      "✅ Low Priority: Manageable with regular maintenance."}
+                      "Low Priority: Manageable with regular maintenance. Monitor periodically."}
                     {result.severity === "None" &&
-                      "ℹ️ No significant threat detected."}
+                      "No significant threat detected. Continue regular field monitoring."}
                     {!["High", "Medium", "Low", "None"].includes(
                       result.severity
                     ) &&
-                      "Assessment unavailable. Consult an expert if concerned."}
+                      "Assessment unavailable. Consult with an expert if concerned."}
                   </p>
                 </div>
 
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
-                  <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2 flex items-center">
-                    📝 Description
-                  </h4>
-                  <p className="text-sm text-blue-700 dark:text-blue-300">
-                    {result.description}
-                  </p>
+                <div className="pt-3 border-t dark:border-gray-600 space-y-3">
+                  <div>
+                    <h4 className="font-medium text-green-600 dark:text-green-400 mb-2">
+                      Description:
+                    </h4>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      {result.description}
+                    </p>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Treatment & Management */}
-            <Card className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200 dark:border-orange-800 shadow-lg">
-              <CardHeader className="bg-orange-600 dark:bg-orange-700 text-white rounded-t-lg">
-                <CardTitle className="text-lg flex items-center">
-                  🛠️ Treatment & Management
+            {/* Treatment Box */}
+            <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center text-orange-600 dark:text-orange-400">
+                  <CheckCircle className="h-5 w-5 mr-2" />
+                  Treatment & Management
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6 space-y-4">
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h4 className="font-medium text-orange-600 dark:text-orange-400 mb-2 flex items-center">
-                    💊 Treatment Methods
-                  </h4>
+              <CardContent>
+                <div className="space-y-2">
                   <p className="text-sm text-gray-700 dark:text-gray-300">
                     {result.treatment}
                   </p>
-                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
-                    <Button
-                      onClick={() => {
-                        const treatmentTask = `Remove ${result.name} weed - ${result.treatment?.split(".")[0] || "Apply recommended weed control"}`;
-                        // Set the suggestion and open TodoModal
-                        setSuggestionText(treatmentTask);
-                        setTodoModalOpen(true);
-                      }}
-                      className="w-full bg-orange-600 hover:bg-orange-700 text-white text-sm py-2 px-4 rounded-md transition-colors flex items-center justify-center gap-2"
-                    >
-                      <Plus className="h-4 w-4" />
-                      Add Treatment to Crop Plan
-                    </Button>
-                  </div>
                 </div>
+                <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
+                  <Button
+                    onClick={() => {
+                      const treatmentTask = `Remove ${result.name} - ${result.treatment?.split(".")[0] || "Apply recommended weed control"}`;
+                      setSuggestionText(treatmentTask);
+                      setTodoModalOpen(true);
+                    }}
+                    className="w-full bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 flex items-center justify-center gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add to Crop Planner
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
-                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <h4 className="font-medium text-orange-600 dark:text-orange-400 mb-2 flex items-center">
-                    🛡️ Prevention Strategies
-                  </h4>
+            {/* Prevention Box */}
+            <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center text-blue-600 dark:text-blue-400">
+                  <CheckCircle className="h-5 w-5 mr-2" />
+                  Prevention Strategies
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
                   <p className="text-sm text-gray-700 dark:text-gray-300">
                     {result.prevention}
                   </p>
@@ -635,60 +654,68 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
               </CardContent>
             </Card>
 
-            {/* Analysis Details */}
-            <div className="grid grid-cols-1 gap-4">
-              <Card className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800 shadow-lg">
-                <CardHeader className="bg-purple-600 dark:bg-purple-700 text-white rounded-t-lg">
-                  <CardTitle className="text-lg flex items-center">
-                    🔍 Root Causes
+            {/* Root Causes Box */}
+            {result.causes && result.causes.length > 0 && (
+              <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center text-purple-600 dark:text-purple-400">
+                    <AlertTriangle className="h-5 w-5 mr-2" />
+                    Root Causes
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6">
-                  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <ul className="space-y-2">
-                      {result.causes.map((cause, i) => (
-                        <li key={i} className="flex items-start">
-                          <span className="text-purple-500 mr-2">•</span>
-                          <span className="text-sm text-gray-700 dark:text-gray-300">
-                            {cause}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
+                <CardContent>
+                  <div className="space-y-2">
+                    {result.causes.map((cause, i) => (
+                      <div
+                        key={i}
+                        className="flex items-start p-2 bg-gray-50 dark:bg-gray-700/50 rounded"
+                      >
+                        <span className="text-purple-500 mr-2">•</span>
+                        <span className="text-sm text-gray-700 dark:text-gray-300">
+                          {cause}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
+            )}
 
-              <Card className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 border-teal-200 dark:border-teal-800 shadow-lg">
-                <CardHeader className="bg-teal-600 dark:bg-teal-700 text-white rounded-t-lg">
-                  <CardTitle className="text-lg flex items-center">
-                    📊 Seasonal Activity
+            {/* Seasonal Activity Chart */}
+            {result.seasonalData && result.seasonalData.length > 0 && (
+              <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center dark:text-white">
+                    <TrendingUp className="h-5 w-5 mr-2 text-teal-600 dark:text-teal-400" />
+                    Seasonal Activity Pattern
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="p-6">
-                  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <div className="space-y-3">
-                      {result.seasonalData.map((data, idx) => (
-                        <div key={idx} className="flex items-center space-x-3">
-                          <span className="text-sm font-medium w-12 text-teal-700 dark:text-teal-300">
-                            {data.month}
-                          </span>
-                          <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-3 relative overflow-hidden">
-                            <div
-                              className="bg-gradient-to-r from-teal-400 to-cyan-500 h-full rounded-full transition-all duration-500"
-                              style={{ width: `${data.occurrence}%` }}
-                            />
-                          </div>
-                          <span className="text-sm text-teal-600 dark:text-teal-400 w-12 text-right font-medium">
-                            {data.occurrence}%
-                          </span>
+                <CardContent>
+                  <div className="space-y-2">
+                    {result.seasonalData.map((data, idx) => (
+                      <div key={idx} className="flex items-center space-x-3">
+                        <span className="text-sm font-medium w-12 text-gray-700 dark:text-gray-300">
+                          {data.month}
+                        </span>
+                        <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 relative overflow-hidden">
+                          <div
+                            className="bg-gradient-to-r from-teal-500 to-green-500 dark:from-teal-400 dark:to-green-400 h-full rounded-full transition-all duration-500"
+                            style={{ width: `${data.occurrence}%` }}
+                          />
                         </div>
-                      ))}
-                    </div>
+                        <span className="text-sm text-gray-600 dark:text-gray-400 w-12 text-right">
+                          {data.occurrence}%
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-4 text-xs text-gray-500 dark:text-gray-400">
+                    <TrendingUp className="h-3 w-3 inline mr-1" />
+                    Based on seasonal patterns and location data
                   </div>
                 </CardContent>
               </Card>
-            </div>
+            )}
           </>
         )}
       </div>

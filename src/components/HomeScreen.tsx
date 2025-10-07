@@ -809,20 +809,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
         );
 
       setTrendingAnnouncements(newAnnouncements);
-
-      // Show notification if new critical issues are detected
-      if (newAnnouncements.some((a) => a.severity === "High")) {
-        toast({
-          title:
-            currentLanguage === "ml"
-              ? "പുതിയ മുന്നറിയിപ്പ്"
-              : "New Critical Alert",
-          description:
-            currentLanguage === "ml"
-              ? "കർഷക ഫോറത്തിൽ നിന്നും പുതിയ സുപ്രധാന മുന്നറിയിപ്പുകൾ കണ്ടെത്തി"
-              : "Critical issues detected from farmer forum discussions",
-        });
-      }
     } catch (error) {
       console.error("Error loading trending announcements:", error);
     } finally {
