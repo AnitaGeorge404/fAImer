@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   ArrowLeft,
   TrendingUp,
@@ -67,7 +67,7 @@ const MarketPricesScreen: React.FC<MarketPricesScreenProps> = ({ onBack }) => {
   const [location, setLocation] = useState<string>("Getting location...");
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [, setTick] = useState(0); // Force re-renders for relative time updates
-  
+
   // Farmer listing states
   const [farmerListings, setFarmerListings] = useState<FarmerListing[]>([]);
   const [showAddListingForm, setShowAddListingForm] = useState(false);
@@ -76,7 +76,7 @@ const MarketPricesScreen: React.FC<MarketPricesScreenProps> = ({ onBack }) => {
     quantity: number;
     unit: string;
     pricePerUnit: number;
-    quality: 'Excellent' | 'Good' | 'Average';
+    quality: "Excellent" | "Good" | "Average";
     harvestDate: string;
     description: string;
   }>({
@@ -320,7 +320,7 @@ Avoid technical terms like "FAQ" (Fair Average Quality) - use plain language ins
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
       const response = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent",
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
         {
           method: "POST",
           headers: {
@@ -440,7 +440,7 @@ Avoid technical terms like "FAQ" (Fair Average Quality) - use plain language ins
               )}
             </Button>
           </div>
-          
+
           {/* Location Info */}
           <div className="flex items-center gap-2 text-green-100 dark:text-green-200 text-sm mb-4">
             <span title={location}>{getTruncatedLocation(location)}</span>
@@ -450,26 +450,26 @@ Avoid technical terms like "FAQ" (Fair Average Quality) - use plain language ins
                 <span>• Updated: {formatRelativeTime(lastUpdated)}</span>
               )}
           </div>
-          
+
           {/* Tab Navigation */}
           <div className="grid grid-cols-2 gap-1 bg-white/10 backdrop-blur-sm p-1 rounded-lg">
             <button
-              onClick={() => setActiveTab('prices')}
+              onClick={() => setActiveTab("prices")}
               className={`px-4 py-2 rounded-md font-medium transition-colors flex items-center justify-center ${
-                activeTab === 'prices'
-                  ? 'bg-white/20 text-white shadow-sm'
-                  : 'text-white/70 hover:text-white hover:bg-white/10'
+                activeTab === "prices"
+                  ? "bg-white/20 text-white shadow-sm"
+                  : "text-white/70 hover:text-white hover:bg-white/10"
               }`}
             >
               <Store className="w-4 h-4 mr-2" />
               Prices
             </button>
             <button
-              onClick={() => setActiveTab('sell')}
+              onClick={() => setActiveTab("sell")}
               className={`px-4 py-2 rounded-md font-medium transition-colors flex items-center justify-center ${
-                activeTab === 'sell'
-                  ? 'bg-white/20 text-white shadow-sm'
-                  : 'text-white/70 hover:text-white hover:bg-white/10'
+                activeTab === "sell"
+                  ? "bg-white/20 text-white shadow-sm"
+                  : "text-white/70 hover:text-white hover:bg-white/10"
               }`}
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -498,8 +498,8 @@ Avoid technical terms like "FAQ" (Fair Average Quality) - use plain language ins
         )}
 
         {/* Tab Content */}
-        {activeTab === 'prices' && (
-          <PricesTabContent 
+        {activeTab === "prices" && (
+          <PricesTabContent
             marketData={marketData}
             nearbyMarkets={nearbyMarkets}
             loading={loading}
@@ -507,8 +507,8 @@ Avoid technical terms like "FAQ" (Fair Average Quality) - use plain language ins
           />
         )}
 
-        {activeTab === 'sell' && (
-          <SellTabContent 
+        {activeTab === "sell" && (
+          <SellTabContent
             farmerListings={farmerListings}
             setFarmerListings={setFarmerListings}
             newListing={newListing}
@@ -518,7 +518,7 @@ Avoid technical terms like "FAQ" (Fair Average Quality) - use plain language ins
       </div>
     </div>
   );
-}
+};
 
 // Prices Tab Component
 const PricesTabContent: React.FC<{
@@ -713,7 +713,7 @@ const SellTabContent: React.FC<{
     quantity: number;
     unit: string;
     pricePerUnit: number;
-    quality: 'Excellent' | 'Good' | 'Average';
+    quality: "Excellent" | "Good" | "Average";
     harvestDate: string;
     description: string;
   };
@@ -722,7 +722,7 @@ const SellTabContent: React.FC<{
     quantity: number;
     unit: string;
     pricePerUnit: number;
-    quality: 'Excellent' | 'Good' | 'Average';
+    quality: "Excellent" | "Good" | "Average";
     harvestDate: string;
     description: string;
   }) => void;
@@ -739,14 +739,15 @@ const SellTabContent: React.FC<{
         pricePerUnit: newListing.pricePerUnit,
         totalValue: newListing.quantity * newListing.pricePerUnit,
         quality: newListing.quality,
-        harvestDate: newListing.harvestDate || new Date().toISOString().split('T')[0],
-        listedDate: new Date().toISOString().split('T')[0],
-        status: 'Available',
+        harvestDate:
+          newListing.harvestDate || new Date().toISOString().split("T")[0],
+        listedDate: new Date().toISOString().split("T")[0],
+        status: "Available",
         views: 0,
         inquiries: 0,
         description: newListing.description,
       };
-      
+
       setFarmerListings([...farmerListings, listing]);
       setNewListing({
         cropName: "",
@@ -762,14 +763,16 @@ const SellTabContent: React.FC<{
   };
 
   const handleDeleteListing = (id: number) => {
-    setFarmerListings(farmerListings.filter(listing => listing.id !== id));
+    setFarmerListings(farmerListings.filter((listing) => listing.id !== id));
   };
 
   return (
     <>
       {/* Add New Listing Button */}
       <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Your Crop Listings</h2>
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+          Your Crop Listings
+        </h2>
         <button
           onClick={() => setShowAddForm(true)}
           className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg flex items-center space-x-2 transition-colors"
@@ -784,7 +787,9 @@ const SellTabContent: React.FC<{
         <Card className="border-green-200 dark:border-green-800">
           <CardContent className="p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Add New Crop Listing</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Add New Crop Listing
+              </h3>
               <button
                 onClick={() => setShowAddForm(false)}
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
@@ -792,7 +797,7 @@ const SellTabContent: React.FC<{
                 ✕
               </button>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -801,32 +806,41 @@ const SellTabContent: React.FC<{
                 <input
                   type="text"
                   value={newListing.cropName}
-                  onChange={(e) => setNewListing({...newListing, cropName: e.target.value})}
+                  onChange={(e) =>
+                    setNewListing({ ...newListing, cropName: e.target.value })
+                  }
                   placeholder="e.g., Tomatoes, Rice, Wheat"
                   className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Quantity *
                 </label>
                 <input
                   type="number"
-                  value={newListing.quantity || ''}
-                  onChange={(e) => setNewListing({...newListing, quantity: parseFloat(e.target.value) || 0})}
+                  value={newListing.quantity || ""}
+                  onChange={(e) =>
+                    setNewListing({
+                      ...newListing,
+                      quantity: parseFloat(e.target.value) || 0,
+                    })
+                  }
                   placeholder="Amount available"
                   className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Unit
                 </label>
                 <select
                   value={newListing.unit}
-                  onChange={(e) => setNewListing({...newListing, unit: e.target.value})}
+                  onChange={(e) =>
+                    setNewListing({ ...newListing, unit: e.target.value })
+                  }
                   className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="kg">kg</option>
@@ -835,27 +849,40 @@ const SellTabContent: React.FC<{
                   <option value="bag">Bag</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Price per Unit (₹) *
                 </label>
                 <input
                   type="number"
-                  value={newListing.pricePerUnit || ''}
-                  onChange={(e) => setNewListing({...newListing, pricePerUnit: parseFloat(e.target.value) || 0})}
+                  value={newListing.pricePerUnit || ""}
+                  onChange={(e) =>
+                    setNewListing({
+                      ...newListing,
+                      pricePerUnit: parseFloat(e.target.value) || 0,
+                    })
+                  }
                   placeholder="Price per unit"
                   className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Quality Grade
                 </label>
                 <select
                   value={newListing.quality}
-                  onChange={(e) => setNewListing({...newListing, quality: e.target.value as 'Excellent' | 'Good' | 'Average'})}
+                  onChange={(e) =>
+                    setNewListing({
+                      ...newListing,
+                      quality: e.target.value as
+                        | "Excellent"
+                        | "Good"
+                        | "Average",
+                    })
+                  }
                   className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="Excellent">Excellent</option>
@@ -863,7 +890,7 @@ const SellTabContent: React.FC<{
                   <option value="Average">Average</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Harvest Date
@@ -871,25 +898,32 @@ const SellTabContent: React.FC<{
                 <input
                   type="date"
                   value={newListing.harvestDate}
-                  onChange={(e) => setNewListing({...newListing, harvestDate: e.target.value})}
+                  onChange={(e) =>
+                    setNewListing({
+                      ...newListing,
+                      harvestDate: e.target.value,
+                    })
+                  }
                   className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
             </div>
-            
+
             <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Description
               </label>
               <textarea
                 value={newListing.description}
-                onChange={(e) => setNewListing({...newListing, description: e.target.value})}
+                onChange={(e) =>
+                  setNewListing({ ...newListing, description: e.target.value })
+                }
                 placeholder="Additional details about your crop (optional)"
                 rows={3}
                 className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
             </div>
-            
+
             <div className="flex justify-end space-x-3 mt-6">
               <button
                 onClick={() => setShowAddForm(false)}
@@ -911,23 +945,29 @@ const SellTabContent: React.FC<{
       {/* Current Listings */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {farmerListings.map((listing) => (
-          <Card key={listing.id} className="hover:shadow-lg transition-shadow dark:bg-gray-800 dark:border-gray-700">
+          <Card
+            key={listing.id}
+            className="hover:shadow-lg transition-shadow dark:bg-gray-800 dark:border-gray-700"
+          >
             <CardContent className="p-4">
               <div className="flex justify-between items-start mb-3">
                 <div>
-                  <h3 className="font-semibold text-lg text-gray-900 dark:text-white">{listing.cropName}</h3>
+                  <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
+                    {listing.cropName}
+                  </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    {listing.quantity} {listing.unit} • ₹{listing.pricePerUnit}/{listing.unit}
+                    {listing.quantity} {listing.unit} • ₹{listing.pricePerUnit}/
+                    {listing.unit}
                   </p>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Badge
                     className={
-                      listing.status === 'Available' 
+                      listing.status === "Available"
                         ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                        : listing.status === 'Sold'
-                        ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
-                        : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
+                        : listing.status === "Sold"
+                          ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+                          : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
                     }
                   >
                     {listing.status}
@@ -940,32 +980,42 @@ const SellTabContent: React.FC<{
                   </button>
                 </div>
               </div>
-              
+
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Total Value:</span>
-                  <span className="font-medium text-green-600">₹{listing.totalValue}</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Total Value:
+                  </span>
+                  <span className="font-medium text-green-600">
+                    ₹{listing.totalValue}
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Quality:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Quality:
+                  </span>
                   <span className="font-medium">{listing.quality}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Harvest Date:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Harvest Date:
+                  </span>
                   <span>{listing.harvestDate}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Listed:</span>
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Listed:
+                  </span>
                   <span>{listing.listedDate}</span>
                 </div>
               </div>
-              
+
               {listing.description && (
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-3 italic">
                   "{listing.description}"
                 </p>
               )}
-              
+
               <div className="flex justify-between items-center mt-4 pt-3 border-t dark:border-gray-700">
                 <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
                   <div className="flex items-center space-x-1">
@@ -977,8 +1027,8 @@ const SellTabContent: React.FC<{
                     <span>{listing.inquiries}</span>
                   </div>
                 </div>
-                
-                {listing.status === 'Available' && (
+
+                {listing.status === "Available" && (
                   <div className="flex items-center space-x-2">
                     <button className="text-blue-600 hover:text-blue-800 text-sm font-medium">
                       Edit
@@ -994,12 +1044,14 @@ const SellTabContent: React.FC<{
           </Card>
         ))}
       </div>
-      
+
       {farmerListings.length === 0 && (
         <Card className="text-center py-12 dark:bg-gray-800 dark:border-gray-700">
           <CardContent>
             <Store className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No Listings Yet</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              No Listings Yet
+            </h3>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               Start selling your crops directly to buyers with fair prices
             </p>
