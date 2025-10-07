@@ -170,30 +170,86 @@ const CropPlannerScreen: React.FC<CropPlannerScreenProps> = ({ onBack }) => {
         "Avoid fresh manure",
       ],
     },
+    Cauliflower: {
+      name: "Cauliflower",
+      avgYieldPerAcre: 12000,
+      currentPrice: 25,
+      season: "Winter",
+      growthPeriod: 100,
+      waterRequirement: "Medium",
+      tips: [
+        "Protect from direct sunlight",
+        "Maintain consistent moisture",
+        "Harvest when heads are firm",
+      ],
+    },
   };
-  const [cropPlans, setCropPlans] = useState<CropPlan[]>([
+  
+  // Static hardcoded crop plans that will always be shown
+  const staticCropPlans: CropPlan[] = [
     {
-      id: 1,
+      id: 1001,
       crop: "Tomato",
-      area: "0.3 acres", // A more realistic plot size for a small farmer
-      sowingDate: "2025-03-01",
-      lastWatered: "2025-08-20",
-      fertilizedDate: "2025-08-15",
-      expenses: 8000, // Reduced expenses for a smaller plot
+      area: "0.5 acres",
+      variety: "Cherry Tomato",
+      expectedYieldPerAcre: 8000,
+      currentMarketPrice: 28,
+      sowingDate: "2025-03-15",
+      lastWatered: "2025-10-05",
+      fertilizedDate: "2025-09-20",
+      expenses: 12000,
     },
     {
-      id: 2,
+      id: 1002,
       crop: "Chilli",
-      area: "0.1 acres", // Very small plot for high-value crop
-      expenses: 5000,
+      area: "0.25 acres",
+      variety: "Green Chilli",
+      expectedYieldPerAcre: 3500,
+      currentMarketPrice: 80,
+      sowingDate: "2025-04-01",
+      lastWatered: "2025-10-06",
+      fertilizedDate: "2025-09-25",
+      expenses: 8000,
     },
     {
-      id: 3,
-      crop: "Carrot", // Changed from Onion to a more common local crop
-      area: "0.2 acres", // Small plot size
+      id: 1003,
+      crop: "Onion",
+      area: "0.4 acres",
+      variety: "Red Onion",
+      expectedYieldPerAcre: 6500,
+      currentMarketPrice: 20,
+      sowingDate: "2025-02-10",
+      lastWatered: "2025-10-04",
+      fertilizedDate: "2025-08-30",
+      expenses: 15000,
+    },
+    {
+      id: 1004,
+      crop: "Carrot",
+      area: "0.3 acres",
+      variety: "Orange Carrot",
+      expectedYieldPerAcre: 8500,
+      currentMarketPrice: 35,
+      sowingDate: "2025-01-20",
+      lastWatered: "2025-10-07",
+      fertilizedDate: "2025-09-10",
       expenses: 10000,
     },
-  ]);
+    {
+      id: 1005,
+      crop: "Cauliflower",
+      area: "0.2 acres",
+      variety: "White Cauliflower",
+      expectedYieldPerAcre: 12000,
+      currentMarketPrice: 25,
+      sowingDate: "2025-02-28",
+      lastWatered: "2025-10-06",
+      fertilizedDate: "2025-09-15",
+      expenses: 9000,
+    },
+  ];
+
+  const [cropPlans, setCropPlans] = useState<CropPlan[]>(staticCropPlans);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<CropPlan | null>(null);
   const [isTodoModalOpen, setIsTodoModalOpen] = useState(false);
@@ -216,18 +272,27 @@ const CropPlannerScreen: React.FC<CropPlannerScreenProps> = ({ onBack }) => {
       try {
         const plans = JSON.parse(savedPlans);
         if (Array.isArray(plans) && plans.length > 0) {
-          setCropPlans(plans);
+          // Filter out any plans that conflict with static plans (by ID)
+          const userPlans = plans.filter((plan: CropPlan) => plan.id < 1000);
+          // Combine static plans with user plans
+          setCropPlans([...staticCropPlans, ...userPlans]);
         }
       } catch (error) {
         console.error("Error loading crop plans:", error);
+        // On error, fallback to static plans only
+        setCropPlans(staticCropPlans);
       }
     }
   }, []);
 
-  // Save crop plans to localStorage whenever they change
+  // Save crop plans to localStorage whenever they change (only user-created plans)
   useEffect(() => {
     if (cropPlans.length > 0) {
-      localStorage.setItem("cropPlans", JSON.stringify(cropPlans));
+      // Only save user-created plans (ID < 1000), not static plans
+      const userPlans = cropPlans.filter(plan => plan.id < 1000);
+      if (userPlans.length > 0) {
+        localStorage.setItem("cropPlans", JSON.stringify(userPlans));
+      }
     }
   }, [cropPlans]);
 

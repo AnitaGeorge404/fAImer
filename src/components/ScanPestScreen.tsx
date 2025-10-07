@@ -14,12 +14,12 @@ import {
   Shield,
   DollarSign,
   AlertCircle,
+  Plus,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import SuggestionPopup from "./SuggestionPopup";
 import TodoModal from "./TodoModal";
 import Notifications from "./Notifications";
 
@@ -57,7 +57,6 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({
 }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [scanResult, setScanResult] = useState<PestResult | null>(null);
-  const [showSuggestion, setShowSuggestion] = useState(false);
   const [suggestionText, setSuggestionText] = useState("");
   const [todoModalOpen, setTodoModalOpen] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
@@ -192,7 +191,7 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
       const base64Image = convertImageToBase64(selectedImage);
       const locationInfo = location
@@ -276,12 +275,12 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({
 
         setScanResult(pestData);
 
-        // Show suggestion for meaningful detection
+        // Automatically open TodoModal with dynamic treatment suggestion
         const name = (pestData.name || "").toLowerCase();
         if (name && !["no pest detected", "analysis error"].includes(name) && !name.includes("no")) {
           const suggestion = `Treat ${pestData.name} - ${pestData.treatment?.split(".")[0] || "Recommended treatment"}`;
           setSuggestionText(suggestion);
-          setShowSuggestion(true);
+          setTodoModalOpen(true); // Open TodoModal directly
         }
       } else {
         throw new Error("Invalid response format from AI");
@@ -409,15 +408,15 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({
       <div className="p-4 space-y-4">
         {/* Tips - Hide when scan result is available */}
         {!scanResult && (
-          <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+          <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 shadow-sm dark:shadow-lg transition-all duration-300">
             <CardContent className="p-4">
               <div className="flex items-start">
-                <Lightbulb className="h-5 w-5 text-yellow-500 dark:text-yellow-400 mr-3 mt-0.5" />
+                <Lightbulb className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mr-3 mt-0.5" />
                 <div>
-                  <h4 className="font-medium text-gray-800 dark:text-white mb-2">
+                  <h4 className="font-medium text-yellow-800 dark:text-yellow-200 mb-2">
                     Pro Tips for Better Detection:
                   </h4>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                  <ul className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
                     <li>• Take close-up photos of affected areas</li>
                     <li>• Ensure good lighting for clear images</li>
                     <li>• Include leaves, stems, or fruits showing damage</li>
@@ -673,6 +672,20 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({
                     </div>
                   ))}
                 </div>
+                <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
+                  <Button
+                    onClick={() => {
+                      const treatmentTask = `Control ${scanResult.name || 'pest'} - ${formatListItems(scanResult.treatment)[0] || 'Apply recommended treatment'}`;
+                      // Set the suggestion and open TodoModal
+                      setSuggestionText(treatmentTask);
+                      setTodoModalOpen(true);
+                    }}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white text-sm py-2 px-4 rounded-md transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Treatment to Crop Plan
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
@@ -775,25 +788,25 @@ const ScanPestScreen: React.FC<ScanPestScreenProps> = ({
           </>
         )}
       </div>
-      {showSuggestion && (
-        <SuggestionPopup
-          suggestion={suggestionText}
-          onAdd={() => setTodoModalOpen(true)}
-          onClose={() => setShowSuggestion(false)}
-        />
-      )}
+      
+      {/* SuggestionPopup removed per user request */}
 
       <TodoModal
         open={todoModalOpen}
         suggestion={suggestionText}
+        showAllCrops={true}
         onClose={() => {
           setTodoModalOpen(false);
-          setShowSuggestion(false);
+          setSuggestionText("");
         }}
-        onAdded={() => setTodoModalOpen(false)}
+        onAdded={() => {
+          setTodoModalOpen(false);
+          setSuggestionText("");
+        }}
       />
 
-      <Notifications />
+      {/* Notifications disabled per user request */}
+      {/* <Notifications /> */}
     </div>
   );
 };

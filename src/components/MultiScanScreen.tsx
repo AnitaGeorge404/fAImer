@@ -86,20 +86,38 @@ const MultiScanScreen: React.FC<MultiScanScreenProps> = ({ onBack }) => {
           style={{ marginTop: "1vh" }}
         >
           <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-full p-1 gap-1 ">
-            {tabs.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setActive(t.id)}
-                className={`px-4 py-2 rounded-full transition-all text-sm font-medium ${
-                  active === t.id
-                    ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-md"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-600/50"
-                }`}
-                aria-pressed={active === t.id}
-              >
-                {t.title}
-              </button>
-            ))}
+            {tabs.map((t) => {
+              // Get tab-specific colors based on the header config
+              const getTabColors = (tabId: string, isActive: boolean) => {
+                if (isActive) {
+                  // Show colored text when active/selected
+                  switch (tabId) {
+                    case "diagnose":
+                      return "bg-white dark:bg-gray-600 text-red-600 dark:text-red-400 shadow-md";
+                    case "scan":
+                      return "bg-white dark:bg-gray-600 text-pink-600 dark:text-pink-400 shadow-md";
+                    case "weed":
+                      return "bg-white dark:bg-gray-600 text-green-600 dark:text-green-400 shadow-md";
+                    default:
+                      return "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-md";
+                  }
+                } else {
+                  // Black/gray text when not selected
+                  return "text-gray-900 dark:text-gray-300 hover:bg-white/50 dark:hover:bg-gray-600/50";
+                }
+              };
+              
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setActive(t.id)}
+                  className={`px-4 py-2 rounded-full transition-all text-sm font-medium ${getTabColors(t.id, active === t.id)}`}
+                  aria-pressed={active === t.id}
+                >
+                  {t.title}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>

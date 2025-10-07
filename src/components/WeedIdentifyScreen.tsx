@@ -10,12 +10,12 @@ import {
   Lightbulb,
   TrendingUp,
   RotateCcw,
+  Plus,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import SuggestionPopup from "./SuggestionPopup";
 import TodoModal from "./TodoModal";
 import Notifications from "./Notifications";
 
@@ -49,9 +49,9 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isIdentifying, setIsIdentifying] = useState(false);
   const [result, setResult] = useState<WeedResult | null>(null);
-  const [showSuggestion, setShowSuggestion] = useState(false);
   const [suggestionText, setSuggestionText] = useState("");
   const [todoModalOpen, setTodoModalOpen] = useState(false);
+  const [affectedCrops, setAffectedCrops] = useState<string[]>([]);
   const [location, setLocation] = useState<LocationData | null>(null);
   const [locationError, setLocationError] = useState<string>("");
 
@@ -63,6 +63,56 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
   );
 
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+  // Function to check if weed affects any crop in the planner
+  const checkCropPlannerForAffectedCrops = (weedName: string) => {
+    try {
+      const raw = localStorage.getItem("cropPlans");
+      if (!raw) return null;
+      
+      const cropPlans = JSON.parse(raw);
+      if (!Array.isArray(cropPlans) || cropPlans.length === 0) return null;
+      
+      // Get crop names from planner
+      const plannerCrops = cropPlans.map((plan: any) => plan.crop?.toLowerCase());
+      
+      // Common weed-crop mappings
+      const weedCropMappings: Record<string, string[]> = {
+        "bermuda grass": ["tomato", "potato", "onion", "wheat", "rice", "corn", "maize"],
+        "pigweed": ["tomato", "potato", "bean", "corn", "maize", "soybean"],
+        "crabgrass": ["rice", "wheat", "onion", "carrot"],
+        "dandelion": ["tomato", "lettuce", "spinach", "cabbage"],
+        "bindweed": ["potato", "tomato", "bean", "pea", "corn", "wheat"],
+        "chickweed": ["lettuce", "spinach", "carrot", "onion"],
+        "purslane": ["tomato", "pepper", "eggplant"],
+        "lamb's quarters": ["beet", "spinach", "chard"],
+        "johnson grass": ["corn", "maize", "sorghum", "cotton"],
+        "foxtail": ["corn", "rice", "wheat", "soybean"]
+      };
+      
+      const weedLower = weedName.toLowerCase();
+      let affectedCrops: string[] = [];
+      
+      // Check direct mappings
+      for (const [weed, crops] of Object.entries(weedCropMappings)) {
+        if (weedLower.includes(weed) || weed.includes(weedLower)) {
+          affectedCrops = [...affectedCrops, ...crops];
+        }
+      }
+      
+      // Find matching crops in planner
+      const matchingCrops = plannerCrops.filter((crop: string) => 
+        affectedCrops.some(affectedCrop => 
+          crop?.includes(affectedCrop) || affectedCrop.includes(crop)
+        )
+      );
+      
+      return matchingCrops.length > 0 ? matchingCrops : null;
+    } catch (error) {
+      console.error("Error checking crop planner:", error);
+      return null;
+    }
+  };
 
   const commonWeeds = [
     { name: "Bermuda Grass", crop: "All crops", severity: "High", icon: "🌾" },
@@ -201,7 +251,7 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
 
     try {
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
       const base64Image = convertImageToBase64(selectedImage);
       const locationInfo = location
@@ -251,12 +301,15 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
 
         setResult(weedData);
 
-        // Show suggestion for meaningful detection
+        // Automatically open TodoModal after successful diagnosis
         const name = (weedData.name || "").toLowerCase();
         if (name && !["no weed detected", "analysis error"].includes(name) && !name.includes("no")) {
           const suggestion = `Remove ${weedData.name} - ${weedData.treatment?.split(".")[0] || "Manual removal recommended"}`;
           setSuggestionText(suggestion);
-          setShowSuggestion(true);
+          // Get all affected crops for reference (still useful for highlighting)
+          const affectedCropsList = checkCropPlannerForAffectedCrops(weedData.name);
+          setAffectedCrops(affectedCropsList || []);
+          setTodoModalOpen(true); // Always open TodoModal for valid weed detection
         }
       } else {
         throw new Error("Invalid response format from AI");
@@ -318,15 +371,15 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
       <div className="p-4 space-y-4">
         {/* Tips - Hide when result is available */}
         {!result && (
-          <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
+          <Card className="bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800 shadow-sm dark:shadow-lg transition-all duration-300">
             <CardContent className="p-4">
               <div className="flex items-start">
-                <Lightbulb className="h-5 w-5 text-yellow-500 dark:text-yellow-400 mr-3 mt-0.5" />
+                <Lightbulb className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mr-3 mt-0.5" />
                 <div>
-                  <h4 className="font-medium text-gray-800 dark:text-white mb-2">
+                  <h4 className="font-medium text-yellow-800 dark:text-yellow-200 mb-2">
                     Pro Tips for Better Identification:
                   </h4>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                  <ul className="text-sm text-yellow-700 dark:text-yellow-300 space-y-1">
                     <li>• Take clear, close-up photos of the entire weed</li>
                     <li>
                       • Ensure good lighting to capture leaf and stem details
@@ -473,139 +526,148 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
         {/* Result */}
         {result && (
           <>
-            <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
-              <CardHeader>
-                <CardTitle className="text-base flex items-center dark:text-white">
-                  <AlertTriangle className="h-5 w-5 mr-2 text-green-600 dark:text-green-400" />
-                  Identification Result
+            {/* Main Identification Results */}
+            <Card className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 border-green-200 dark:border-green-800 shadow-lg">
+              <CardHeader className="bg-green-600 dark:bg-green-700 text-white rounded-t-lg">
+                <CardTitle className="text-lg flex items-center">
+                  <AlertTriangle className="h-6 w-6 mr-2" />
+                  🌿 Weed Identification Result
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium dark:text-white">Weed:</span>
-                  <Badge
-                    className={
-                      result.confidence > 0
-                        ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                        : "bg-gray-100 text-gray-800"
-                    }
-                  >
-                    {result.name}
-                  </Badge>
+              <CardContent className="p-6 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Identified Weed</p>
+                    <p className="font-bold text-lg text-gray-800 dark:text-white">{result.name}</p>
+                  </div>
+                  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Confidence Level</p>
+                    <p className="font-bold text-lg text-green-600 dark:text-green-400">{result.confidence}%</p>
+                  </div>
                 </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="font-medium dark:text-white">
-                    Confidence:
-                  </span>
-                  <span className="text-green-600 dark:text-green-400 font-bold">
-                    {result.confidence}%
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <span className="font-medium dark:text-white">Severity:</span>
-                  <Badge className={getSeverityColor(result.severity)}>
-                    {result.severity}
-                  </Badge>
-                </div>
-
-                {/* Severity Explanation */}
-                <div className="pt-3 border-t dark:border-gray-600">
-                  <h4 className="font-medium text-green-600 dark:text-green-400 mb-2 flex items-center">
-                    <AlertTriangle className="h-4 w-4 mr-2" />
-                    Severity Assessment:
-                  </h4>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Threat Level</p>
+                    <Badge className={getSeverityColor(result.severity)}>
+                      {result.severity}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
                     {result.severity === "High" &&
-                      "This is a highly invasive weed that requires immediate removal. It can quickly spread and compete aggressively with your crops for nutrients and water."}
+                      "🚨 High Priority: Immediate removal required. Highly invasive and competitive."}
                     {result.severity === "Medium" &&
-                      "This weed requires attention and should be controlled soon. Regular monitoring and timely removal will help prevent it from spreading."}
+                      "⚠️ Medium Priority: Control soon. Regular monitoring recommended."}
                     {result.severity === "Low" &&
-                      "This is a minor weed that can be managed with regular maintenance. It poses minimal threat to crop growth."}
+                      "✅ Low Priority: Manageable with regular maintenance."}
                     {result.severity === "None" &&
-                      "No significant weed detected. The plant appears to be non-invasive or beneficial."}
-                    {!["High", "Medium", "Low", "None"].includes(
-                      result.severity
-                    ) &&
-                      "Severity assessment unavailable. Monitor the plant and consult with an agricultural expert if concerned."}
+                      "ℹ️ No significant threat detected."}
+                    {!["High", "Medium", "Low", "None"].includes(result.severity) &&
+                      "Assessment unavailable. Consult an expert if concerned."}
                   </p>
                 </div>
 
-                <div className="pt-3 border-t dark:border-gray-600 space-y-3">
-                  <div>
-                    <h4 className="font-medium text-green-600 dark:text-green-400 mb-2">
-                      Description:
-                    </h4>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                      {result.description}
-                    </p>
-                  </div>
-
-                  <div>
-                    <h4 className="font-medium text-green-600 dark:text-green-400 mb-2">
-                      Treatment:
-                    </h4>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                      {result.treatment}
-                    </p>
-                  </div>
-
-                  <div>
-                    <h4 className="font-medium text-green-600 dark:text-green-400 mb-2">
-                      Prevention:
-                    </h4>
-                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                      {result.prevention}
-                    </p>
-                  </div>
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-2 flex items-center">
+                    📝 Description
+                  </h4>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    {result.description}
+                  </p>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Causes and Seasonal */}
+            {/* Treatment & Management */}
+            <Card className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border-orange-200 dark:border-orange-800 shadow-lg">
+              <CardHeader className="bg-orange-600 dark:bg-orange-700 text-white rounded-t-lg">
+                <CardTitle className="text-lg flex items-center">
+                  🛠️ Treatment & Management
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6 space-y-4">
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h4 className="font-medium text-orange-600 dark:text-orange-400 mb-2 flex items-center">
+                    💊 Treatment Methods
+                  </h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    {result.treatment}
+                  </p>
+                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                    <Button
+                      onClick={() => {
+                        const treatmentTask = `Remove ${result.name} weed - ${result.treatment?.split('.')[0] || 'Apply recommended weed control'}`;
+                        // Set the suggestion and open TodoModal
+                        setSuggestionText(treatmentTask);
+                        setTodoModalOpen(true);
+                      }}
+                      className="w-full bg-orange-600 hover:bg-orange-700 text-white text-sm py-2 px-4 rounded-md transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Treatment to Crop Plan
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <h4 className="font-medium text-orange-600 dark:text-orange-400 mb-2 flex items-center">
+                    🛡️ Prevention Strategies
+                  </h4>
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    {result.prevention}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Analysis Details */}
             <div className="grid grid-cols-1 gap-4">
-              <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-base dark:text-white flex items-center">
-                    <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
-                    Causes
+              <Card className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-800 shadow-lg">
+                <CardHeader className="bg-purple-600 dark:bg-purple-700 text-white rounded-t-lg">
+                  <CardTitle className="text-lg flex items-center">
+                    🔍 Root Causes
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
-                    {result.causes.map((c, i) => (
-                      <li key={i}>• {c}</li>
-                    ))}
-                  </ul>
+                <CardContent className="p-6">
+                  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <ul className="space-y-2">
+                      {result.causes.map((cause, i) => (
+                        <li key={i} className="flex items-start">
+                          <span className="text-purple-500 mr-2">•</span>
+                          <span className="text-sm text-gray-700 dark:text-gray-300">{cause}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
-                <CardHeader>
-                  <CardTitle className="text-base dark:text-white flex items-center">
-                    <TrendingUp className="h-4 w-4 mr-2" />
-                    Seasonality
+              <Card className="bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-900/20 dark:to-cyan-900/20 border-teal-200 dark:border-teal-800 shadow-lg">
+                <CardHeader className="bg-teal-600 dark:bg-teal-700 text-white rounded-t-lg">
+                  <CardTitle className="text-lg flex items-center">
+                    📊 Seasonal Activity
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    {result.seasonalData.map((data, idx) => (
-                      <div key={idx} className="flex items-center space-x-3">
-                        <span className="text-sm font-medium w-10 dark:text-white">
-                          {data.month}
-                        </span>
-                        <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-3 relative overflow-hidden">
-                          <div
-                            className="bg-gradient-to-r from-green-400 to-red-500 h-full rounded-full"
-                            style={{ width: `${data.occurrence}%` }}
-                          />
+                <CardContent className="p-6">
+                  <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                    <div className="space-y-3">
+                      {result.seasonalData.map((data, idx) => (
+                        <div key={idx} className="flex items-center space-x-3">
+                          <span className="text-sm font-medium w-12 text-teal-700 dark:text-teal-300">
+                            {data.month}
+                          </span>
+                          <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-3 relative overflow-hidden">
+                            <div
+                              className="bg-gradient-to-r from-teal-400 to-cyan-500 h-full rounded-full transition-all duration-500"
+                              style={{ width: `${data.occurrence}%` }}
+                            />
+                          </div>
+                          <span className="text-sm text-teal-600 dark:text-teal-400 w-12 text-right font-medium">
+                            {data.occurrence}%
+                          </span>
                         </div>
-                        <span className="text-sm text-gray-600 dark:text-gray-400 w-10">
-                          {data.occurrence}%
-                        </span>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -615,25 +677,26 @@ const WeedIdentifyScreen: React.FC<WeedIdentifyScreenProps> = ({
       </div>
 
       <canvas ref={canvasRef} className="hidden" />
-      {showSuggestion && (
-        <SuggestionPopup
-          suggestion={suggestionText}
-          onAdd={() => setTodoModalOpen(true)}
-          onClose={() => setShowSuggestion(false)}
-        />
-      )}
-
+      
       <TodoModal
         open={todoModalOpen}
         suggestion={suggestionText}
+        relatedCrops={affectedCrops}
+        showAllCrops={true}
         onClose={() => {
           setTodoModalOpen(false);
-          setShowSuggestion(false);
+          setAffectedCrops([]);
+          setSuggestionText("");
         }}
-        onAdded={() => setTodoModalOpen(false)}
+        onAdded={() => {
+          setTodoModalOpen(false);
+          setAffectedCrops([]);
+          setSuggestionText("");
+        }}
       />
 
-      <Notifications />
+      {/* Notifications disabled per user request */}
+      {/* <Notifications /> */}
     </div>
   );
 };

@@ -195,7 +195,7 @@ const SoilAnalyzerScreen: React.FC<SoilAnalyzerScreenProps> = ({ onBack }) => {
       console.log("🔄 Sending request to Gemini API...");
       
       // Try different models in order of preference
-      const modelsToTry = ["gemini-2.5-flash"];
+      const modelsToTry = ["gemini-1.5-flash"];
       let result;
       let lastError;
       
