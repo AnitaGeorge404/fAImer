@@ -582,6 +582,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     };
     return translations[englishText] || englishText;
   };
+  // new commnet
   const features = [
     {
       id: "identify",
@@ -1236,8 +1237,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       setCurrentAnnouncementIndex(0);
     }
   }, [announcements.length, currentAnnouncementIndex]);
-//testgit
-// newc trest
+  //testgit
+  // newc trest
   return (
     <div className="pb-20 bg-background min-h-screen transition-colors duration-300">
       {/* Greeting Banner */}
