@@ -1237,6 +1237,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     }
   }, [announcements.length, currentAnnouncementIndex]);
 //testgit
+// newc trest
   return (
     <div className="pb-20 bg-background min-h-screen transition-colors duration-300">
       {/* Greeting Banner */}
