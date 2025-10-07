@@ -7,42 +7,43 @@ It is designed to empower farmers with smarter decision-making and accessible te
 
 ## Features
 
-- **Diagnose Crop** – Detect crop diseases using AI-powered image analysis.  
-- **Scan Pest** – Identify and classify pests via computer vision.  
-- **Market Prices** – Fetch live market price data for crops and commodities.  
-- **Crop Planner** – Generate dynamic farming roadmaps and visual flowcharts.  
-- **Farming Twin** – Maintain a digital twin of the farm for planning and monitoring.  
-- **Farmer Forum** – Community platform for discussions and peer support.  
-- **Knowledge Center** – Curated agricultural guides, FAQs, and best practices.  
-- **Buy Inputs** – Access seeds, fertilizers, and other inputs directly.  
-- **Expense Tracker** – Manage and analyze farm-related expenses with AI insights.  
-- **Agriculture News** – Stay updated with the latest sector developments.  
-- **Government Schemes** – Access information on relevant programs and subsidies.  
-- **Labourers** – Manage farm labor tasks and resources.  
-- **AI Assistant** – Voice and text-based natural language interaction in multiple Indian languages.  
-- **Updates & Alerts** – Timely notifications about weather, markets, and farming risks.  
+- **Diagnose Crop** – Detect crop diseases using AI-powered image analysis.
+- **Scan Pest** – Identify and classify pests via computer vision.
+- **Market Prices** – Fetch live market price data for crops and commodities.
+- **Crop Planner** – Generate dynamic farming roadmaps and visual flowcharts.
+- **Crop Guide** – Your digital farming assistant for planning and monitoring.
+- **Farmer Forum** – Community platform for discussions and peer support.
+- **Knowledge Center** – Curated agricultural guides, FAQs, and best practices.
+- **Buy Inputs** – Access seeds, fertilizers, and other inputs directly.
+- **Expense Tracker** – Manage and analyze farm-related expenses with AI insights.
+- **Agriculture News** – Stay updated with the latest sector developments.
+- **Government Schemes** – Access information on relevant programs and subsidies.
+- **Labourers** – Manage farm labor tasks and resources.
+- **AI Assistant** – Voice and text-based natural language interaction in multiple Indian languages.
+- **Updates & Alerts** – Timely notifications about weather, markets, and farming risks.
 
 ---
 
 ## Tech Stack
 
-- **Frontend**: React 18 + TypeScript + Vite  
-- **UI**: Tailwind CSS, Shadcn/UI, Lucide React, Recharts, Mermaid  
-- **State Management**: React Context API + Custom Hooks  
-- **Authentication & Storage**: Firebase Authentication + Firestore  
-- **AI Models**:  
-  - Google Gemini 2.0 Flash (text + vision API)  
-  - LaMini-Flan-T5-77M (offline text generation)  
-  - Gemma (efficient on-device LLM)  
-  - WebLLMs + Transformers.js for browser-based inference  
-- **Offline-First**: Service Workers, background sync, cache strategies  
-- **Voice Features**: Web Speech API (recognition + TTS)  
+- **Frontend**: React 18 + TypeScript + Vite
+- **UI**: Tailwind CSS, Shadcn/UI, Lucide React, Recharts, Mermaid
+- **State Management**: React Context API + Custom Hooks
+- **Authentication & Storage**: Firebase Authentication + Firestore
+- **AI Models**:
+  - Google Gemini 2.0 Flash (text + vision API)
+  - LaMini-Flan-T5-77M (offline text generation)
+  - Gemma (efficient on-device LLM)
+  - WebLLMs + Transformers.js for browser-based inference
+- **Offline-First**: Service Workers, background sync, cache strategies
+- **Voice Features**: Web Speech API (recognition + TTS)
 
 ---
 
 ## Getting Started
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/your-username/fAimer.git
 cd fAimer
@@ -121,3 +122,4 @@ Muhammad Basil
 
 License
 This project is licensed under the MIT License – feel free to use and adapt!
+```

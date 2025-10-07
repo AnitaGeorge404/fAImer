@@ -569,7 +569,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       "Diagnose Crop": "വിള രോഗനിർണയം",
       "Market Prices": "വിപണി വിലകൾ",
       "Crop Planner": "വിള ആസൂത്രണം",
-      "Farming Twin": "കാർഷിക ട്വിൻ",
+      "Crop Guide": "വിള ഗൈഡ്",
       "Weather Alerts": "കാലാവസ്ഥാ മുന്നറിയിപ്പുകൾ",
       "Farmer Forum": "കർഷക ഫോറം",
       "Knowledge Center": "വിജ്ഞാന കേന്ദ്രം",
@@ -606,7 +606,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     },
     {
       id: "twin",
-      title: getTranslatedText("Farming Twin"),
+      title: getTranslatedText("Crop Guide"),
       icon: Users,
       color:
         "bg-purple-100 text-purple-600 dark:bg-purple-950 dark:text-purple-300",
@@ -614,7 +614,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     },
     {
       id: "twin",
-      title: getTranslatedText("Farming Twin"),
+      title: getTranslatedText("Crop Guide"),
       icon: Users,
       color:
         "bg-purple-100 text-purple-600 dark:bg-purple-950 dark:text-purple-300",
@@ -1053,7 +1053,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
               onFeatureClick("twin");
               toast({
                 title: getVoiceText("navigating"),
-                description: `${currentLanguage === "ml" ? "കാർഷിക ട്വിൻ" : "Farming Twin"} • ${(decision.confidence * 100).toFixed(0)}%`,
+                description: `${currentLanguage === "ml" ? "വിള ഗൈഡ്" : "Crop Guide"} • ${(decision.confidence * 100).toFixed(0)}%`,
               });
             }
             break;
