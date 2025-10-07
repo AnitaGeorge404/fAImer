@@ -1284,8 +1284,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
                 {loadingWeather
                   ? "..."
                   : weatherData
-                    ? `${weatherData.temperature - 8}°`
-                    : "22°"}
+                    ? `${weatherData.temperature}°`
+                    : "32°"}
               </span>
               <span className="text-muted-foreground ml-1">C</span>
             </div>
