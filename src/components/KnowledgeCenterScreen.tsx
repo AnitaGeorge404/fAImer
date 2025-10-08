@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/contexts/TranslationContext";
+
 interface KnowledgeCenterScreenProps {
   onBack?: () => void;
   onFeatureClick?: (featureId: string) => void;
@@ -19,6 +21,26 @@ const KnowledgeCenterScreen: React.FC<KnowledgeCenterScreenProps> = ({
   onBack,
   onFeatureClick,
 }) => {
+  const { currentLanguage } = useTranslation();
+
+  // Translation helper for Tamil
+  const getTranslatedText = (englishText: string): string => {
+    if (currentLanguage !== "ta") return englishText;
+
+    const translations: { [key: string]: string } = {
+      Resources: "வளங்கள்",
+      "Knowledge Center": "அறிவு மையம்",
+      "Buy Inputs": "உள்ளீடுகளை வாங்கவும்",
+      "Pest Scanner": "பூச்சி ஸ்கேனர்",
+      "Expense Tracker": "செலவு கண்காணிப்பு",
+      "Agriculture News": "விவசாய செய்திகள்",
+      "Govt Schemes": "அரசு திட்டங்கள்",
+      Labourers: "தொழிலாளர்கள்",
+    };
+
+    return translations[englishText] || englishText;
+  };
+
   return (
     <div className="pb-20 bg-background min-h-screen transition-colors duration-300">
       {/* Header */}
@@ -28,7 +50,9 @@ const KnowledgeCenterScreen: React.FC<KnowledgeCenterScreenProps> = ({
             <Button variant="ghost" size="sm" onClick={onBack} className="p-2">
               <ArrowLeft className="h-5 w-5" />
             </Button>
-            <h1 className="text-lg font-semibold text-foreground">Resources</h1>
+            <h1 className="text-lg font-semibold text-foreground">
+              {getTranslatedText("Resources")}
+            </h1>
           </div>
         </div>
       </div>
@@ -103,7 +127,7 @@ const KnowledgeCenterScreen: React.FC<KnowledgeCenterScreenProps> = ({
                     />
                   </div>
                   <h3 className="font-medium text-foreground text-sm transition-colors duration-300">
-                    {tool.title}
+                    {getTranslatedText(tool.title)}
                   </h3>
                 </CardContent>
               </Card>

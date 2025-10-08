@@ -22,6 +22,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import TodoModal from "./TodoModal";
 import Notifications from "./Notifications";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 interface DiagnosisResult {
   disease: string;
@@ -70,8 +71,54 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
+  const { currentLanguage } = useTranslation();
 
   const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
+  // Translation helper for Tamil
+  const getTranslatedText = (englishText: string): string => {
+    if (currentLanguage !== "ta") return englishText;
+
+    const translations: { [key: string]: string } = {
+      "Diagnose Crop Disease": "பயிர் நோய் கண்டறிதல்",
+      "Analyzing...": "பகுப்பாய்வு செய்கிறது...",
+      "Common Diseases in Your Region": "உங்கள் பகுதியில் பொதுவான நோய்கள்",
+      Affects: "பாதிக்கிறது",
+      "Disease Analysis Result": "நோய் பகுப்பாய்வு முடிவு",
+      Disease: "நோய்",
+      Confidence: "நம்பிக்கை",
+      Severity: "தீவிரம்",
+      "Affected Crop": "பாதிக்கப்பட்ட பயிர்",
+      Symptoms: "அறிகுறிகள்",
+      Treatment: "சிகிச்சை",
+      Prevention: "தடுப்பு",
+      "Economic Impact": "பொருளாதார தாக்கம்",
+      "Possible Causes": "சாத்தியமான காரணங்கள்",
+      "Seasonal Occurrence": "பருவகால நிகழ்வு",
+      High: "அதிகம்",
+      Medium: "நடுத்தரம்",
+      Low: "குறைவு",
+      Mild: "மிதமான",
+      Moderate: "மிதமான",
+      Severe: "கடுமையான",
+      Critical: "முக்கியமான",
+      Healthy: "ஆரோக்கியமான",
+      "No Disease Detected": "நோய் எதுவும் கண்டறியப்படவில்லை",
+      "Add to Crop Planner": "பயிர் திட்டமிடலில் சேர்க்கவும்",
+      Retake: "மீண்டும் எடு",
+      "Take Photo": "புகைப்படம் எடு",
+      "Upload Image": "படத்தை பதிவேற்றவும்",
+      "Capture from Camera": "கேமராவில் இருந்து படம் எடுக்கவும்",
+      "Choose from Gallery": "கேலரியில் இருந்து தேர்வு செய்யவும்",
+      "occurrences per month": "மாதத்திற்கு நிகழ்வுகள்",
+      "Location access denied. Results may be less accurate.":
+        "இருப்பிடம் அணுகல் மறுக்கப்பட்டது. முடிவுகள் குறைவான துல்லியமாக இருக்கலாம்.",
+      "Geolocation not supported by this browser.":
+        "இந்த உலாவியால் புவி இருப்பிடம் ஆதரிக்கப்படவில்லை.",
+    };
+
+    return translations[englishText] || englishText;
+  };
 
   useEffect(() => {
     getCurrentLocation();
@@ -571,7 +618,9 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
                   disabled={isDiagnosing}
                   className="w-full mt-3 bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700"
                 >
-                  {isDiagnosing ? "Analyzing..." : "Diagnose Crop Disease"}
+                  {isDiagnosing
+                    ? getTranslatedText("Analyzing...")
+                    : getTranslatedText("Diagnose Crop Disease")}
                 </Button>
               </div>
             )}
@@ -583,7 +632,7 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
           <Card className="dark:bg-gray-800 dark:border-gray-700 shadow-sm dark:shadow-lg transition-all duration-300">
             <CardHeader>
               <CardTitle className="text-base dark:text-white">
-                Common Diseases in Your Region
+                {getTranslatedText("Common Diseases in Your Region")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -600,7 +649,7 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
                           {disease.name}
                         </p>
                         <p className="text-xs text-gray-600 dark:text-gray-300">
-                          Affects: {disease.crop}
+                          {getTranslatedText("Affects")}: {disease.crop}
                         </p>
                       </div>
                     </div>
@@ -622,12 +671,14 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
               <CardHeader>
                 <CardTitle className="text-base flex items-center dark:text-white">
                   <AlertTriangle className="h-5 w-5 mr-2 text-red-600 dark:text-red-400" />
-                  Disease Analysis Result
+                  {getTranslatedText("Disease Analysis Result")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium dark:text-white">Disease:</span>
+                  <span className="font-medium dark:text-white">
+                    {getTranslatedText("Disease")}:
+                  </span>
                   <Badge
                     className={`${diagnosisResult.confidence > 0 ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300" : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"}`}
                   >
@@ -636,21 +687,23 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-medium dark:text-white">
-                    Confidence:
+                    {getTranslatedText("Confidence")}:
                   </span>
                   <span className="text-green-600 dark:text-green-400 font-bold">
                     {diagnosisResult.confidence}%
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium dark:text-white">Severity:</span>
+                  <span className="font-medium dark:text-white">
+                    {getTranslatedText("Severity")}:
+                  </span>
                   <Badge className={getSeverityColor(diagnosisResult.severity)}>
-                    {diagnosisResult.severity}
+                    {getTranslatedText(diagnosisResult.severity)}
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-medium dark:text-white">
-                    Affected Crop:
+                    {getTranslatedText("Affected Crop")}:
                   </span>
                   <span className="text-gray-700 dark:text-gray-300">
                     {diagnosisResult.affectedCrop}
@@ -693,7 +746,7 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
                 <div className="pt-3 border-t dark:border-gray-600 space-y-3">
                   <div>
                     <h4 className="font-medium text-red-600 dark:text-red-400 mb-2">
-                      Symptoms:
+                      {getTranslatedText("Symptoms")}:
                     </h4>
                     <p className="text-sm text-gray-700 dark:text-gray-300">
                       {cleanMarkdownText(diagnosisResult.symptoms)}
@@ -708,7 +761,7 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
               <CardHeader>
                 <CardTitle className="text-base flex items-center text-green-600 dark:text-green-400">
                   <CheckCircle className="h-5 w-5 mr-2" />
-                  Treatment Recommendations
+                  {getTranslatedText("Treatment")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -746,7 +799,7 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
               <CardHeader>
                 <CardTitle className="text-base flex items-center text-blue-600 dark:text-blue-400">
                   <Shield className="h-5 w-5 mr-2" />
-                  Prevention Strategies
+                  {getTranslatedText("Prevention")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -770,7 +823,7 @@ const DiagnoseCropScreen: React.FC<DiagnoseCropScreenProps> = ({
               <CardHeader>
                 <CardTitle className="text-base flex items-center text-red-600 dark:text-red-400">
                   <DollarSign className="h-5 w-5 mr-2" />
-                  Economic Impact
+                  {getTranslatedText("Economic Impact")}
                 </CardTitle>
               </CardHeader>
               <CardContent>

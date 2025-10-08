@@ -12,12 +12,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { useTranslation } from "@/contexts/TranslationContext";
 
 interface KnowledgeScreenProps {
   onBack?: () => void;
 }
 
 const KnowledgeScreen: React.FC<KnowledgeScreenProps> = ({ onBack }) => {
+  const { currentLanguage } = useTranslation();
   const [expandedSections, setExpandedSections] = useState<
     Record<string, boolean>
   >({});
@@ -27,6 +29,69 @@ const KnowledgeScreen: React.FC<KnowledgeScreenProps> = ({ onBack }) => {
       ...prev,
       [sectionId]: !prev[sectionId],
     }));
+  };
+
+  // Translation helper for Tamil
+  const getTranslatedText = (englishText: string): string => {
+    if (currentLanguage !== "ta") return englishText;
+
+    const translations: { [key: string]: string } = {
+      // Header
+      "Knowledge Center": "அறிவு மையம்",
+      "Farming Tips & Guides": "விவசாய உதவிக்குறிப்புகள் & வழிகாட்டிகள்",
+      "Comprehensive farming knowledge and practical solutions using homemade remedies and natural methods.":
+        "வீட்டில் செய்யப்பட்ட தீர்வுகள் மற்றும் இயற்கை முறைகளைப் பயன்படுத்தி விரிவான விவசாய அறிவு மற்றும் நடைமுறை தீர்வுகள்.",
+
+      // Section Titles
+      "Soil Testing & pH Detection": "மண் சோதனை & pH கண்டறிதல்",
+      "Disease Identification & Treatment": "நோய் கண்டறிதல் & சிகிச்சை",
+      "Seasonal Farming Calendar": "பருவகால விவசாய நாட்காட்டி",
+      "Water Management & Conservation": "நீர் மேலாண்மை & பாதுகாப்பு",
+      "Homemade Organic Fertilizers": "வீட்டில் செய்யப்பட்ட இயற்கை உரங்கள்",
+      "Companion Planting Guide": "துணை தாவர வழிகாட்டி",
+      "Quick Soil pH Reference": "விரைவு மண் pH குறிப்பு",
+      "Crop Rotation Guide": "பயிர் சுழற்சி வழிகாட்டி",
+      "Water Management": "நீர் மேலாண்மை",
+      "Pest Control Methods": "பூச்சி கட்டுப்பாடு முறைகள்",
+      "Seasonal Calendar": "பருவகால நாட்காட்டி",
+      "Weather Patterns": "வானிலை வடிவங்கள்",
+
+      // Introductions
+      "Learn to test your soil using simple homemade methods to determine pH levels and nutrient deficiencies.":
+        "pH அளவுகள் மற்றும் ஊட்டச்சத்து குறைபாடுகளை தீர்மானிக்க எளிய வீட்டு முறைகளைப் பயன்படுத்தி உங்கள் மண்ணை சோதிக்க கற்றுக்கொள்ளுங்கள்.",
+      "Identify common plant diseases early and treat them with natural homemade remedies.":
+        "பொதுவான தாவர நோய்களை ஆரம்பத்தில் கண்டறிந்து இயற்கை வீட்டு தீர்வுகளால் சிகிச்சை அளிக்கவும்.",
+      "Understand the importance of crop rotation and implement effective rotation strategies.":
+        "பயிர் சுழற்சியின் முக்கியத்துவத்தை புரிந்து கொண்டு பயனுள்ள சுழற்சி உத்திகளை செயல்படுத்துங்கள்.",
+      "Efficient water management techniques for sustainable farming.":
+        "நிலையான விவசாயத்திற்கான திறமையான நீர் மேலாண்மை நுட்பங்கள்.",
+      "Natural and chemical pest control methods for different crops.":
+        "பல்வேறு பயிர்களுக்கான இயற்கை மற்றும் இரசாயன பூச்சி கட்டுப்பாடு முறைகள்.",
+      "Month-by-month guide for seasonal farming activities.":
+        "பருவகால விவசாய நடவடிக்கைகளுக்கான மாதந்தோறும் வழிகாட்டி.",
+      "Understanding weather patterns and their impact on farming.":
+        "வானிலை வடிவங்கள் மற்றும் விவசாயத்தில் அவற்றின் தாக்கத்தை புரிந்துகொள்வது.",
+
+      // Section Headers
+      "Testing Methods:": "சோதனை முறைகள்:",
+      "Remedies:": "தீர்வுகள்:",
+      "Materials Needed:": "தேவையான பொருட்கள்:",
+      "Common Diseases:": "பொதுவான நோய்கள்:",
+      "Prevention Tips:": "தடுப்பு உதவிக்குறிப்புகள்:",
+
+      // pH Reference
+      Acidic: "அமிலம்",
+      "pH 0-6.9": "pH 0-6.9",
+      "Add lime": "சுண்ணாம்பு சேர்க்கவும்",
+      Neutral: "நடுநிலை",
+      "pH 7.0": "pH 7.0",
+      "Ideal range": "சிறந்த வரம்பு",
+      Alkaline: "காரம்",
+      "pH 7.1-14": "pH 7.1-14",
+      "Add sulfur": "கந்தகம் சேர்க்கவும்",
+    };
+
+    return translations[englishText] || englishText;
   };
 
   const knowledgeSections = [
@@ -331,7 +396,7 @@ const KnowledgeScreen: React.FC<KnowledgeScreenProps> = ({ onBack }) => {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <h1 className="text-lg font-semibold text-foreground">
-              Knowledge Center
+              {getTranslatedText("Knowledge Center")}
             </h1>
           </div>
         </div>
@@ -339,8 +404,7 @@ const KnowledgeScreen: React.FC<KnowledgeScreenProps> = ({ onBack }) => {
 
       <div className="p-4">
         <p className="text-muted-foreground mb-6">
-          Comprehensive farming knowledge and practical solutions using homemade
-          remedies and natural methods.
+          {getTranslatedText("Farming Tips & Guides")}
         </p>
 
         <div className="space-y-4">
@@ -359,7 +423,7 @@ const KnowledgeScreen: React.FC<KnowledgeScreenProps> = ({ onBack }) => {
                     <div className="flex items-center gap-3">
                       <Icon className={`h-5 w-5 ${section.color}`} />
                       <span className="font-medium text-foreground">
-                        {section.title}
+                        {getTranslatedText(section.title)}
                       </span>
                     </div>
                     {isExpanded ? (
@@ -375,7 +439,7 @@ const KnowledgeScreen: React.FC<KnowledgeScreenProps> = ({ onBack }) => {
                       {section.id === "soil-testing" && (
                         <>
                           <p className="text-sm text-muted-foreground mt-4">
-                            {section.content.introduction}
+                            {getTranslatedText(section.content.introduction)}
                           </p>
 
                           <div className="space-y-4">

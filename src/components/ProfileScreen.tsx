@@ -50,6 +50,44 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack }) => {
     languages.find((lang) => lang.code === currentLanguage) || languages[0]
   );
 
+  // Translation helper for Tamil
+  const getTranslatedText = (englishText: string): string => {
+    if (currentLanguage !== "ta") return englishText;
+
+    const translations: { [key: string]: string } = {
+      Verified: "சரிபார்க்கப்பட்டது",
+      Joined: "சேர்ந்தது",
+      "Farm Size": "பண்ணை அளவு",
+      Experience: "அனுபவம்",
+      "Farm Information": "பண்ணை தகவல்",
+      "Soil Type": "மண் வகை",
+      "Primary Language": "முதன்மை மொழி",
+      "AI Assistance Level": "AI உதவி நிலை",
+      Intermediate: "இடைநிலை",
+      Beginner: "தொடக்கநிலை",
+      Advanced: "மேம்பட்ட",
+      Expert: "நிபுணர்",
+      "Update personal information": "தனிப்பட்ட தகவலை புதுப்பிக்கவும்",
+      "Change app language": "செயலி மொழியை மாற்றவும்",
+      "Configure voice settings": "குரல் அமைப்புகளை உள்ளமைக்கவும்",
+      "Privacy & export settings": "தனியுரிமை & ஏற்றுமதி அமைப்புகள்",
+      "Get help and contact support":
+        "உதவி பெறவும் மற்றும் ஆதரவைத் தொடர்பு கொள்ளவும்",
+      Theme: "தீம்",
+      "Dark Mode": "இருண்ட பயன்முறை",
+      "Light Mode": "ஒளி பயன்முறை",
+      Language: "மொழி",
+      "Select your preferred language":
+        "உங்கள் விருப்ப மொழியைத் தேர்ந்தெடுக்கவும்",
+      Account: "கணக்கு",
+      "Sign Out": "வெளியேறு",
+      "Are you sure you want to sign out?":
+        "நீங்கள் வெளியேற விரும்புகிறீர்களா?",
+    };
+
+    return translations[englishText] || englishText;
+  };
+
   // Keep selectedLanguage in sync with currentLanguage
   useEffect(() => {
     const lang =
@@ -86,35 +124,35 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack }) => {
     {
       id: "edit-profile",
       title: t("Edit Profile"),
-      subtitle: "Update personal information",
+      subtitle: getTranslatedText("Update personal information"),
       icon: Edit,
       color: "text-blue-600 dark:text-blue-400",
     },
     {
       id: "language",
       title: t("Language Settings"),
-      subtitle: "Change app language",
+      subtitle: getTranslatedText("Change app language"),
       icon: Globe,
       color: "text-green-600 dark:text-green-400",
     },
     {
       id: "voice-settings",
       title: t("Voice Assistant"),
-      subtitle: "Configure voice settings",
+      subtitle: getTranslatedText("Configure voice settings"),
       icon: Settings,
       color: "text-purple-600 dark:text-purple-400",
     },
     {
       id: "privacy",
       title: t("Data Privacy"),
-      subtitle: "Privacy & export settings",
+      subtitle: getTranslatedText("Privacy & export settings"),
       icon: Settings,
       color: "text-orange-600 dark:text-orange-400",
     },
     {
       id: "help",
       title: t("Help & Support"),
-      subtitle: "Get help and contact support",
+      subtitle: getTranslatedText("Get help and contact support"),
       icon: HelpCircle,
       color: "text-blue-600 dark:text-blue-400",
     },
@@ -173,7 +211,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack }) => {
                   </h2>
                   {userData.verified && (
                     <div className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded-full text-xs font-medium">
-                      ✓ Verified
+                      ✓ {getTranslatedText("Verified")}
                     </div>
                   )}
                 </div>
@@ -185,7 +223,8 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack }) => {
                   {userData.location}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-muted-foreground mt-1">
-                  {userData.phone} • Joined {userData.joinedDate}
+                  {userData.phone} • {getTranslatedText("Joined")}{" "}
+                  {userData.joinedDate}
                 </p>
               </div>
             </div>
@@ -197,7 +236,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack }) => {
                   {userData.farmSize}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-muted-foreground">
-                  Farm Size
+                  {getTranslatedText("Farm Size")}
                 </p>
               </div>
               <div className="text-center">
@@ -205,7 +244,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack }) => {
                   {userData.experience}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-muted-foreground">
-                  Experience
+                  {getTranslatedText("Experience")}
                 </p>
               </div>
             </div>
@@ -216,13 +255,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack }) => {
         <Card className="dark:bg-card dark:border-border shadow-sm dark:shadow-lg transition-all duration-300">
           <CardHeader>
             <CardTitle className="text-base text-foreground">
-              {t("Farm Information")}
+              {getTranslatedText("Farm Information")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between items-center py-2">
               <span className="text-sm text-gray-600 dark:text-muted-foreground">
-                Soil Type
+                {getTranslatedText("Soil Type")}
               </span>
               <span className="font-medium text-foreground">
                 {userData.soilType}
@@ -230,7 +269,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack }) => {
             </div>
             <div className="flex justify-between items-center py-2">
               <span className="text-sm text-gray-600 dark:text-muted-foreground">
-                Primary Language
+                {getTranslatedText("Primary Language")}
               </span>
               <span className="font-medium text-foreground">
                 {userData.language}
@@ -238,10 +277,10 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack }) => {
             </div>
             <div className="flex justify-between items-center py-2">
               <span className="text-sm text-gray-600 dark:text-muted-foreground">
-                AI Assistance Level
+                {getTranslatedText("AI Assistance Level")}
               </span>
               <span className="font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-2 py-1 rounded text-sm border border-blue-200 dark:border-blue-800">
-                {userData.aiLevel}
+                {getTranslatedText(userData.aiLevel)}
               </span>
             </div>
           </CardContent>
@@ -261,10 +300,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ onBack }) => {
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-800 dark:text-foreground">
-                    {t("Dark Mode")}
+                    {getTranslatedText(
+                      theme === "dark" ? "Dark Mode" : "Light Mode"
+                    )}
                   </h3>
                   <p className="text-xs text-gray-500 dark:text-muted-foreground">
-                    Switch between light and dark theme
+                    {getTranslatedText("Theme")}
                   </p>
                 </div>
               </div>

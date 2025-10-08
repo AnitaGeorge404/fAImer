@@ -560,10 +560,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     loadLocationAndWeather();
   }, [currentLanguage]);
   const getTranslatedText = (englishText: string) => {
-    if (currentLanguage !== "ml") return englishText;
-    const translations: {
-      [key: string]: string;
-    } = {
+    if (currentLanguage !== "ml" && currentLanguage !== "ta")
+      return englishText;
+
+    const mlTranslations: { [key: string]: string } = {
       "Welcome back": "തിരികെ വരവിന് സ്വാഗതം",
       "Let's check your farm status": "നിങ്ങളുടെ കൃഷിയുടെ നില പരിശോധിക്കാം",
       "Farm Management": "കാർഷിക മാനേജ്മെന്റ്",
@@ -582,6 +582,50 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       "Agriculture News": "കാർഷിക വാർത്തകൾ",
       "Govt Schemes": "സർക്കാർ പദ്ധതികൾ",
     };
+
+    const taTranslations: { [key: string]: string } = {
+      "Welcome back": "மீண்டும் வரவேற்கிறோம்",
+      "Let's check your farm status": "உங்கள் பண்ணை நிலையை சரிபார்ப்போம்",
+      "Farm Management": "பண்ணை மேலாண்மை",
+      "More Tools": "மேலும் கருவிகள்",
+      "Diagnose Crop": "பயிர் நோய் கண்டறிதல்",
+      "Market Prices": "சந்தை விலைகள்",
+      "Crop Planner": "பயிர் திட்டமிடல்",
+      "Farming Twin": "விவசாய இரட்டையர்",
+      "Soil Analyzer": "மண் பகுப்பாய்வி",
+      "Weather Alerts": "வானிலை எச்சரிக்கைகள்",
+      "Farmer Forum": "விவசாயி மன்றம்",
+      "Knowledge Center": "அறிவு மையம்",
+      "Buy Inputs": "உள்ளீடுகளை வாங்கவும்",
+      "Scan Pest": "பூச்சி ஸ்கேன்",
+      "Expense Tracker": "செலவு கண்காணிப்பு",
+      "Agriculture News": "விவசாய செய்திகள்",
+      "Govt Schemes": "அரசு திட்டங்கள்",
+      "Announcements & Alerts": "அறிவிப்புகள் & எச்சரிக்கைகள்",
+      "Trending issues from Farmer Forum":
+        "விவசாயி மன்றத்திலிருந்து பிரபலமான பிரச்சினைகள்",
+      "Loading trending issues...": "பிரபலமான பிரச்சினைகளை ஏற்றுகிறது...",
+      "Storm Alert": "புயல் எச்சரிக்கை",
+      "Drought Warning": "வறட்சி எச்சரிக்கை",
+      "Crop Disease": "பயிர் நோய்",
+      "Market Update": "சந்தை புதுப்பிப்பு",
+      "Irrigation Tips": "நீர்ப்பாசன உதவிக்குறிப்புகள்",
+      "Pest Control": "பூச்சி கட்டுப்பாடு",
+      "Live Update": "நேரடி புதுப்பிப்பு",
+      Normal: "இயல்பு",
+      Today: "இன்று",
+      Error: "பிழை",
+      "Crop Recommendations": "பயிர் பரிந்துரைகள்",
+      "Crop Guide": "பயிர் வழிகாட்டி",
+      Identify: "அடையாளம் காணவும்",
+      "Showing weather information": "வானிலை தகவல் காட்டுகிறது",
+      "Showing current weather": "தற்போதைய வானிலை காட்டுகிறது",
+      "Showing weather forecast": "வானிலை முன்னறிவிப்பு காட்டுகிறது",
+      "Showing weather alerts": "வானிலை எச்சரிக்கைகள் காட்டுகிறது",
+    };
+
+    const translations =
+      currentLanguage === "ml" ? mlTranslations : taTranslations;
     return translations[englishText] || englishText;
   };
   // new commnet
@@ -1392,22 +1436,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-lg font-semibold text-foreground transition-colors duration-300">
-                {currentLanguage === "ml"
-                  ? "അറിയിപ്പുകളും മുന്നറിയിപ്പുകളും"
-                  : "Announcements & Alerts"}
+                {getTranslatedText("Announcements & Alerts")}
               </h2>
               {trendingAnnouncements.length > 0 && (
                 <p className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-                  {currentLanguage === "ml"
-                    ? "കർഷക ഫോറത്തിൽ നിന്നുള്ള ട്രെൻഡിംഗ് പ്രശ്നങ്ങൾ"
-                    : "Trending issues from Farmer Forum"}
+                  {getTranslatedText("Trending issues from Farmer Forum")}
                 </p>
               )}
               {isLoadingTrending && (
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 animate-pulse">
-                  {currentLanguage === "ml"
-                    ? "ട്രെൻഡിംഗ് പ്രശ്നങ്ങൾ ലോഡ് ചെയ്യുന്നു..."
-                    : "Loading trending issues..."}
+                  {getTranslatedText("Loading trending issues...")}
                 </p>
               )}
             </div>
