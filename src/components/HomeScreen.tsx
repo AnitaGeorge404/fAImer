@@ -45,6 +45,12 @@ import { routeFromTranscript } from "@/lib/voiceNavigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { TrendingAnalyzer } from "@/lib/trendingAnalysis";
 import type { TrendingAlert } from "@/lib/trendingAnalysis";
+import {
+  autoTranslateTo,
+  GOOGLE_TRANSLATE_LANGUAGES,
+  type GoogleTranslateLanguageCode,
+  waitForGoogleTranslate,
+} from "@/utils/googleTranslate";
 // Crop Wise icon now served from public uploads
 // Mapping icon now served from public uploads
 
@@ -846,6 +852,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   const [isWeatherAlertOpen, setIsWeatherAlertOpen] = useState(false);
   const [selectedAlert, setSelectedAlert] = useState<any>(null);
 
+  // Google Translate state
+  const [showTranslateMenu, setShowTranslateMenu] = useState(false);
+  const [isGoogleTranslateReady, setIsGoogleTranslateReady] = useState(false);
+
   // Announcement carousel state
   const [currentAnnouncementIndex, setCurrentAnnouncementIndex] = useState(0);
 
@@ -865,6 +875,38 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     );
     return r;
   };
+
+  // Initialize Google Translate
+  useEffect(() => {
+    const initGoogleTranslate = async () => {
+      console.log("🌐 Waiting for Google Translate to load...");
+      const ready = await waitForGoogleTranslate(10000); // Wait up to 10 seconds
+      if (ready) {
+        setIsGoogleTranslateReady(true);
+        console.log("✅ Google Translate is ready!");
+      } else {
+        console.warn("⚠️ Google Translate failed to load within timeout");
+      }
+    };
+
+    initGoogleTranslate();
+  }, []);
+
+  // Close translate menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (showTranslateMenu && !target.closest(".translate-menu-container")) {
+        setShowTranslateMenu(false);
+      }
+    };
+
+    if (showTranslateMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [showTranslateMenu]);
 
   const handleCurrentWeatherClick = () => {
     // Create current weather alert data based on current conditions
@@ -1347,6 +1389,88 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
         />
       </div>
 
+      {/* Google Translate Button */}
+      <div className="fixed top-4 right-20 z-20 translate-menu-container">
+        <Button
+          variant="outline"
+          className="h-14 w-14 rounded-full shadow-lg transition-all duration-300 hover:scale-110"
+          onClick={() => setShowTranslateMenu(!showTranslateMenu)}
+          title={currentLanguage === "ml" ? "ഭാഷ മാറ്റുക" : "Change Language"}
+        >
+          <span className="text-xl">🌐</span>
+        </Button>
+
+        {/* Translate Menu Dropdown */}
+        {showTranslateMenu && (
+          <div className="absolute top-16 right-0 bg-background border border-border rounded-lg shadow-xl p-2 min-w-[200px] z-30 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="text-xs font-semibold text-muted-foreground mb-2 px-2">
+              {currentLanguage === "ml"
+                ? "ഭാഷ തിരഞ്ഞെടുക്കുക"
+                : "Select Language"}
+            </div>
+            <div className="space-y-1">
+              {Object.entries(GOOGLE_TRANSLATE_LANGUAGES).map(
+                ([code, name]) => (
+                  <button
+                    key={code}
+                    onClick={async () => {
+                      if (!isGoogleTranslateReady) {
+                        toast({
+                          title:
+                            currentLanguage === "ml"
+                              ? "കാത്തിരിക്കുക"
+                              : "Please Wait",
+                          description:
+                            currentLanguage === "ml"
+                              ? "Google Translate ലോഡ് ചെയ്യുന്നു..."
+                              : "Google Translate is loading...",
+                          variant: "default",
+                        });
+
+                        // Try to wait a bit more
+                        const ready = await waitForGoogleTranslate(5000);
+                        if (!ready) {
+                          toast({
+                            title: currentLanguage === "ml" ? "പിശക്" : "Error",
+                            description:
+                              currentLanguage === "ml"
+                                ? "Google Translate ലോഡ് ചെയ്യാൻ കഴിഞ്ഞില്ല. പേജ് റീഫ്രഷ് ചെയ്യുക."
+                                : "Could not load Google Translate. Please refresh the page.",
+                            variant: "destructive",
+                          });
+                          setShowTranslateMenu(false);
+                          return;
+                        }
+                        setIsGoogleTranslateReady(true);
+                      }
+
+                      autoTranslateTo(code as GoogleTranslateLanguageCode);
+                      setShowTranslateMenu(false);
+                      toast({
+                        title:
+                          currentLanguage === "ml"
+                            ? "ഭാഷ മാറ്റി"
+                            : "Language Changed",
+                        description: `${currentLanguage === "ml" ? "പരിഭാഷ" : "Translating to"} ${name}`,
+                      });
+                    }}
+                    disabled={!isGoogleTranslateReady}
+                    className={`w-full text-left px-3 py-2 rounded hover:bg-accent hover:text-accent-foreground transition-colors text-sm ${!isGoogleTranslateReady ? "opacity-50 cursor-wait" : ""}`}
+                  >
+                    {name}
+                    {!isGoogleTranslateReady && (
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        (loading...)
+                      </span>
+                    )}
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Voice Assistant Button */}
       <Button
         variant={listening || isProcessing ? "secondary" : "default"}
@@ -1753,6 +1877,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Hidden Google Translate Element */}
+      <div id="google_translate_element" className="hidden"></div>
     </div>
   );
 };
