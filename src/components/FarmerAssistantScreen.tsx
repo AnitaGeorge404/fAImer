@@ -138,11 +138,18 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
       window.speechSynthesis.onvoiceschanged = loadVoices;
     } else {
       toast({
-        title: language === "malayalam" ? "പിന്തുണയില്ല" : "Not supported",
+        title:
+          language === "malayalam"
+            ? "പിന്തുണയില്ല"
+            : language === "tamil"
+              ? "ஆதரவு இல்லை"
+              : "Not supported",
         description:
           language === "malayalam"
             ? "ഈ ബ്രൗസറിൽ ടെക്സ്റ്റ്-ടു-സ്പീച്ച് പിന്തുണയില്ല"
-            : "Text-to-speech is not supported in this browser",
+            : language === "tamil"
+              ? "இந்த உலாவியில் உரையிலிருந்து பேச்சு ஆதரவு இல்லை"
+              : "Text-to-speech is not supported in this browser",
         variant: "destructive",
       });
     }
@@ -180,11 +187,18 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
   const performSpeech = (messageId: string, text: string) => {
     if (!speechSynthesis || !isSpeechReady) {
       toast({
-        title: language === "malayalam" ? "പിന്തുണയില്ല" : "Not supported",
+        title:
+          language === "malayalam"
+            ? "പിന്തുണയില്ല"
+            : language === "tamil"
+              ? "ஆதரவு இல்லை"
+              : "Not supported",
         description:
           language === "malayalam"
             ? "ഈ ബ്രൗസറിൽ ടെക്സ്റ്റ്-ടു-സ്പീച്ച് പിന്തുണയില്ല"
-            : "Text-to-speech is not supported in this browser",
+            : language === "tamil"
+              ? "இந்த உலாவியில் உரையிலிருந்து பேச்சு ஆதரவு இல்லை"
+              : "Text-to-speech is not supported in this browser",
         variant: "destructive",
       });
       isProcessingSpeechRef.current = false;
@@ -203,20 +217,28 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
       const utterance = new SpeechSynthesisUtterance(cleanText);
       const voices = speechSynthesis.getVoices();
 
-      // Prioritize Malayalam voice, fallback to English only for English language
+      // Prioritize native voice for each language
       let selectedVoice;
       if (language === "malayalam") {
         selectedVoice = voices.find((v) => v.lang.includes("ml")) || null;
         if (!selectedVoice) {
           toast({
-            title:
-              language === "malayalam"
-                ? "മലയാളം ശബ്ദം ലഭ്യമല്ല"
-                : "Malayalam Voice Unavailable",
+            title: "മലയാളം ശബ്ദം ലഭ്യമല്ല",
             description:
-              language === "malayalam"
-                ? "മലയാളം ടെക്സ്റ്റ്-ടു-സ്പീച്ച് ശബ്ദം ലഭ്യമല്ല. ദയവായി Google TTS-ൽ മലയാളം ശബ്ദം ഇൻസ്റ്റാൾ ചെയ്യുക അല്ലെങ്കിൽ മറ്റൊരു ബ്രൗസർ/ഉപകരണം പരീക്ഷിക്കുക."
-                : "No Malayalam TTS voice found. Please install a Malayalam voice in Google TTS or try a different browser/device.",
+              "മലയാളം ടെക്സ്റ്റ്-ടു-സ്പീച്ച് ശബ്ദം ലഭ്യമല്ല. ദയവായി Google TTS-ൽ മലയാളം ശബ്ദം ഇൻസ്റ്റാൾ ചെയ്യുക അല്ലെങ്കിൽ മറ്റൊരു ബ്രൗസർ/ഉപകരണം പരീക്ഷിക്കുക.",
+            variant: "destructive",
+          });
+          isProcessingSpeechRef.current = false;
+          processNextSpeech();
+          return;
+        }
+      } else if (language === "tamil") {
+        selectedVoice = voices.find((v) => v.lang.includes("ta")) || null;
+        if (!selectedVoice) {
+          toast({
+            title: "தமிழ் குரல் கிடைக்கவில்லை",
+            description:
+              "தமிழ் உரை-க்கு-பேச்சு குரல் கிடைக்கவில்லை. தயவுசெய்து Google TTS இல் தமிழ் குரலை நிறுவுங்கள் அல்லது வேறு உலாவி/சாதனத்தை முயற்சிக்கவும்.",
             variant: "destructive",
           });
           isProcessingSpeechRef.current = false;
@@ -236,7 +258,12 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
         utterance.voice = selectedVoice;
         utterance.lang = selectedVoice.lang;
       } else {
-        utterance.lang = language === "malayalam" ? "ml-IN" : "en-US";
+        utterance.lang =
+          language === "malayalam"
+            ? "ml-IN"
+            : language === "tamil"
+              ? "ta-IN"
+              : "en-US";
       }
 
       utterance.rate = 0.85;
@@ -262,7 +289,12 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
         isProcessingSpeechRef.current = false;
         if (event.error !== "interrupted" && event.error !== "canceled") {
           toast({
-            title: language === "malayalam" ? "പിശക്" : "Speech Error",
+            title:
+              language === "malayalam"
+                ? "പിശക്"
+                : language === "tamil"
+                  ? "பிழை"
+                  : "Speech Error",
             description: `Speech failed: ${event.error}`,
             variant: "destructive",
           });
@@ -280,8 +312,8 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
 
   // Text-to-Speech functions
   const stripMarkdown = (text: string): string => {
-    if (language === "malayalam") {
-      return text.replace(/\n+/g, " ").trim(); // Minimal processing for Malayalam
+    if (language === "malayalam" || language === "tamil") {
+      return text.replace(/\n+/g, " ").trim(); // Minimal processing for Malayalam and Tamil
     }
     return text
       .replace(/#{1,6}\s+/g, "")
@@ -299,11 +331,18 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
   const handleTextToSpeech = (messageId: string, text: string) => {
     if (!speechSynthesis || !isSpeechReady) {
       toast({
-        title: language === "malayalam" ? "പിന്തുണയില്ല" : "Not supported",
+        title:
+          language === "malayalam"
+            ? "പിന്തുണയില്ല"
+            : language === "tamil"
+              ? "ஆதரவு இல்லை"
+              : "Not supported",
         description:
           language === "malayalam"
             ? "ഈ ബ്രൗസറിൽ ടെക്സ്റ്റ്-ടു-സ്പീച്ച് പിന്തുണയില്ല"
-            : "Text-to-speech is not supported in this browser",
+            : language === "tamil"
+              ? "இந்த உலாவியில் உரையிலிருந்து பேச்சு ஆதரவு இல்லை"
+              : "Text-to-speech is not supported in this browser",
         variant: "destructive",
       });
       return;
@@ -341,7 +380,7 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
   }, [messages, isLoading]);
 
   const formatMessageText = (text: string): { __html: string } => {
-    if (language === "malayalam") {
+    if (language === "malayalam" || language === "tamil") {
       return { __html: text.replace(/\n/g, "<br />") };
     }
     const html = marked.parse(text) as string;
@@ -355,7 +394,12 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
       (window as any).webkitSpeechRecognition;
     if (!SR) return null;
     const r: any = new SR();
-    r.lang = language === "malayalam" ? "ml-IN" : "en-IN";
+    r.lang =
+      language === "malayalam"
+        ? "ml-IN"
+        : language === "tamil"
+          ? "ta-IN"
+          : "en-IN";
     r.interimResults = true;
     r.maxAlternatives = 1;
     r.continuous = false;
@@ -375,11 +419,17 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
     if (!rec) {
       toast({
         title:
-          language === "malayalam" ? "വോയ്സ് ലഭ്യമല്ല" : "Voice not available",
+          language === "malayalam"
+            ? "വോയ്സ് ലഭ്യമല്ല"
+            : language === "tamil"
+              ? "குரல் கிடைக்கவில்லை"
+              : "Voice not available",
         description:
           language === "malayalam"
             ? "ഈ ബ്രൗസറിൽ മൈക്ക് പിന്തുണയില്ല."
-            : "Microphone support is not available in this browser.",
+            : language === "tamil"
+              ? "இந்த உலாவியில் மைக் ஆதரவு இல்லை."
+              : "Microphone support is not available in this browser.",
         variant: "destructive",
       });
       return;
@@ -407,7 +457,12 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
         setInterimText("");
         setIsProcessing(true);
         toast({
-          title: language === "malayalam" ? "കേട്ടത്" : "Voice Input Received",
+          title:
+            language === "malayalam"
+              ? "കേട്ടത്"
+              : language === "tamil"
+                ? "குரல் உள்ளீடு பெறப்பட்டது"
+                : "Voice Input Received",
           description: `"${finalTranscript}"`,
         });
 
@@ -425,11 +480,18 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
       setInterimText("");
       setIsProcessing(false);
       toast({
-        title: language === "malayalam" ? "പിശക്" : "Error",
+        title:
+          language === "malayalam"
+            ? "പിശക്"
+            : language === "tamil"
+              ? "பிழை"
+              : "Error",
         description:
           language === "malayalam"
             ? "വോയ്സ് തിരിച്ചറിയാൻ കഴിഞ്ഞില്ല"
-            : "Voice recognition failed. Please try again.",
+            : language === "tamil"
+              ? "குரல் அடையாளம் காண முடியவில்லை. மீண்டும் முயற்சிக்கவும்."
+              : "Voice recognition failed. Please try again.",
         variant: "destructive",
       });
     };
@@ -501,7 +563,11 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
 
     try {
       const languagePrompt =
-        language === "malayalam" ? "Respond in Malayalam language. " : "";
+        language === "malayalam"
+          ? "Respond in Malayalam language. "
+          : language === "tamil"
+            ? "Respond in Tamil language. "
+            : "";
       const farmingPrompt = `${languagePrompt}You are a helpful farming assistant for Indian farmers. Provide practical, actionable advice on farming topics. Keep responses concise and well-structured. User question: ${userMessage.text}`;
 
       const response = await getAIResponse(farmingPrompt, {
@@ -722,17 +788,22 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
               </Button>
             )}
             <h1 className="text-lg font-semibold text-foreground whitespace-nowrap">
-              Farming Assistant
+              {language === "malayalam"
+                ? "കൃഷി സഹായി"
+                : language === "tamil"
+                  ? "விவசாய உதவியாளர்"
+                  : "Farming Assistant"}
             </h1>
           </div>
           <div className="ml-4">
             <Select value={language} onValueChange={setLanguage}>
-              <SelectTrigger className="w-24">
+              <SelectTrigger className="w-32">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="english">English</SelectItem>
-                <SelectItem value="malayalam">Malayalam</SelectItem>
+                <SelectItem value="malayalam">മലയാളം</SelectItem>
+                <SelectItem value="tamil">தமிழ்</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -849,11 +920,19 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
         {(listening || interimText) && (
           <div className="mb-3 bg-background/90 backdrop-blur-sm border border-border rounded-lg p-3 shadow-lg">
             <div className="text-xs text-muted-foreground mb-1">
-              {language === "malayalam" ? "കേൾക്കുന്നു..." : "Listening..."}
+              {language === "malayalam"
+                ? "കേൾക്കുന്നു..."
+                : language === "tamil"
+                  ? "கேட்கிறது..."
+                  : "Listening..."}
             </div>
             <div className="text-sm text-foreground font-medium">
               {interimText ||
-                (language === "malayalam" ? "സംസാരിക്കുക..." : "Speak now...")}
+                (language === "malayalam"
+                  ? "സംസാരിക്കുക..."
+                  : language === "tamil"
+                    ? "இப்போது பேசுங்கள்..."
+                    : "Speak now...")}
             </div>
           </div>
         )}
@@ -873,7 +952,13 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
             <input
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="Ask me anything about farming..."
+              placeholder={
+                language === "malayalam"
+                  ? "കൃഷിയെക്കുറിച്ച് എന്തും ചോദിക്കൂ..."
+                  : language === "tamil"
+                    ? "விவசாயத்தைப் பற்றி எதையும் கேளுங்கள்..."
+                    : "Ask me anything about farming..."
+              }
               onKeyPress={(e) =>
                 e.key === "Enter" && !e.shiftKey && handleSendMessage()
               }
@@ -885,7 +970,9 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
                 fontFamily:
                   language === "malayalam"
                     ? "'Noto Sans Malayalam', sans-serif"
-                    : "inherit",
+                    : language === "tamil"
+                      ? "'Noto Sans Tamil', sans-serif"
+                      : "inherit",
               }}
             />
             <Button
@@ -897,14 +984,20 @@ const FarmerAssistantScreen: React.FC<AssistantProps> = ({
                 listening
                   ? language === "malayalam"
                     ? "കേൾക്കുന്നു…"
-                    : "Listening…"
+                    : language === "tamil"
+                      ? "கேட்கிறது..."
+                      : "Listening…"
                   : isProcessing
                     ? language === "malayalam"
                       ? "പ്രോസസ്സിംഗ്..."
-                      : "Processing..."
+                      : language === "tamil"
+                        ? "செயலாக்குகிறது..."
+                        : "Processing..."
                     : language === "malayalam"
                       ? "വോയ്സ് ഇൻപുട്ട്"
-                      : "Voice input"
+                      : language === "tamil"
+                        ? "குரல் உள்ளீடு"
+                        : "Voice input"
               }
               style={{ zIndex: 10 }}
             >
